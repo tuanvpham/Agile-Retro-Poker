@@ -35,7 +35,7 @@ These instructions will get you a copy of the project up and running on your loc
 - Install MySQL with brew
 1. ```brew install mysql```
 2. ```brew services start mysql```
-3. ```mysql -uroot -p```
+3. ```mysql -uroot```
 4. ```CREATE DATABASE agilecommandcentral CHARACTER SET UTF8;```
 5. ```CREATE USER group10@localhost IDENTIFIED BY 'password';```
 6. ```GRANT ALL PRIVILEGES ON agilecommandcentral.* TO group10@localhost;```
