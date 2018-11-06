@@ -25,7 +25,7 @@ SECRET_KEY = 'nokc_1a3rphmia4g*gxu!ho80rv4dqo*kabm(10jrvhd4g*$6e'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1']
 
 
 # Application definition
@@ -73,6 +73,13 @@ WSGI_APPLICATION = 'agilecommandcentral.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
+
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#    }
+#}
 
 DATABASES = {
     'default': {
