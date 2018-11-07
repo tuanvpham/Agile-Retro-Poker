@@ -27,7 +27,9 @@ These instructions will get you a copy of the project up and running on your loc
 10. You will see a portal to the project on terminal (something like http://127.0.0.1:8000/).
 
 #### Pep8 Style Guide
-- Check out this page to install pep8 on Visual Studio Code: https://code.visualstudio.com/docs/python/linting
+- Visual Studio Code: https://code.visualstudio.com/docs/python/linting
+- Atom: https://atom.io/packages/pep8
+- Sublime Text: https://packagecontrol.io/packages/Python%20PEP8%20Autoformat
 
 #### MySQL (Linux)
 - Checkout this page to install MySQL: https://www.digitalocean.com/community/tutorials/how-to-use-mysql-or-mariadb-with-your-django-application-on-ubuntu-14-04
