@@ -3,7 +3,9 @@ An application that holds all features needed for the agile methodology that int
 
 ## Getting Started
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+
 ### Installing
+#### Django
 1. Clone project
 2. Install pip (package manager)
 
@@ -24,6 +26,25 @@ These instructions will get you a copy of the project up and running on your loc
 9. To run the app: ```python manage.py runserver```
 10. You will see a portal to the project on terminal (something like http://127.0.0.1:8000/).
 
+#### Pep8 Style Guide
+- Check out this page to install pep8 on Visual Studio Code: https://code.visualstudio.com/docs/python/linting
+
+#### MySQL (Linux)
+- Checkout this page to install MySQL: https://www.digitalocean.com/community/tutorials/how-to-use-mysql-or-mariadb-with-your-django-application-on-ubuntu-14-04
+- Do not install MySQL Community Server on Mac
+- Install MySQL with brew
+1. ```brew install mysql```
+2. ```brew services start mysql```
+3. ```mysql -uroot```
+4. ```CREATE DATABASE agilecommandcentral CHARACTER SET UTF8;```
+5. ```CREATE USER group10@localhost IDENTIFIED BY 'password';```
+6. ```GRANT ALL PRIVILEGES ON agilecommandcentral.* TO group10@localhost;```
+
+- From agilecommandcentral project directory, run 
+1. ```python manage.py makemigrations```
+2. ```python manage.py migrate```
+3. ```python manage.py runserver```
+
 
 ## Running tests
 How to run tests...
@@ -37,7 +58,6 @@ How to deploy...
 * Jira API - Integration
 * AWS - Deployment
 * iOS - Mobile Development
-
 
 ## Authors
 * Katherine Rosenfeld - Front End
