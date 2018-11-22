@@ -49,7 +49,9 @@ These instructions will get you a copy of the project up and running on your loc
 
 
 ## Running tests
-How to run tests...
+1. Coverage
+    - Everytime you add some code to the project run this: ```coverage run --source ='.' manage.py test```
+    - Read coverage report: ```coverage report```
 
 ## Deployment
 How to deploy...

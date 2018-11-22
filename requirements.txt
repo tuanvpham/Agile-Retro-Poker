@@ -11,6 +11,7 @@ cffi==1.11.5
 channels==2.1.5
 chardet==3.0.4
 constantly==15.1.0
+coverage==4.5.1
 cryptography==2.3.1
 daphne==2.2.2
 defusedxml==0.5.0
