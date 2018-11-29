@@ -11,9 +11,9 @@ def index(request):
     s.save()
     r.save()
     ## u.save()
-    t.save()
+    ## t.save()
 
     ## message = u.username + "(" + r.name + ")" + " is in a session of " + s.name + ", and is looking at " + t.name
-    message = "(" + r.name + ")" + " is in a session of " + s.name + ", and is looking at " + t.name
+    message = "(" + r.name + ")" + " is in a session of " + s.name + ", and is looking at "
 
     return HttpResponse(message)
