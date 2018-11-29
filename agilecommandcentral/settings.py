@@ -84,7 +84,7 @@ DATABASES = {
         'NAME': 'KyleDBAdmin',
         'USER': 'KyleDBAdmin',
         'PASSWORD': 'KyleCaKeFaRt100!!',
-        'HOST': 'dacc.cn6ier2gilv6.us-east-2.rds.amazonaws.com/',
+        'HOST': 'dacc.cn6ier2gilv6.us-east-2.rds.amazonaws.com',
         'PORT': '',
     }
 }
