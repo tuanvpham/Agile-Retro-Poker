@@ -16,5 +16,3 @@ def index(request):
     message = u.username + "(" + r.name + ")" + " is in a session of " + s.name + ", and is looking at " + t.name
 
     return HttpResponse(message)
-
-    return HttpResponse("HelloWorld")
