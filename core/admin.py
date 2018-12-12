@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import Session, Role, User, Story
 
-# Register your models here.
+models = Session, Role, User, Story
+admin.site.register(models)
