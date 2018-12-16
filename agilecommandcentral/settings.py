@@ -132,6 +132,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'core.User'
+AUTHENTICATION_BACKENDS = (
+    'core.auth_backend.EmailPasswordlessAuthBackend',
+)
 
 # Change this with authenticated user in production
 REST_FRAMEWORK = {
