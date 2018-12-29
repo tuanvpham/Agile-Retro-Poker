@@ -1,8 +1,15 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.utils.translation import ugettext_lazy as _
+
 
 AbstractUser._meta.get_field('email')._unique = True
 AbstractUser._meta.get_field('username')._unique = False
+
+
+class UsernameValidatorAllowSpace(UnicodeUsernameValidator):
+    regex = r'^[\w.@+\- ]+$'
 
 
 class Session(models.Model):
@@ -24,6 +31,14 @@ class Role(models.Model):
 
 
 class User(AbstractUser):
+    username_validator = UsernameValidatorAllowSpace()
+    username = models.CharField(
+        _('username'),
+        max_length=150,
+        help_text=_(
+            'Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.'),
+        validators=[username_validator],
+    )
     role = models.ForeignKey(Role, on_delete=models.CASCADE, null=True)
     session = models.ForeignKey(Session, on_delete=models.CASCADE, null=True)
     USERNAME_FIELD = 'email'
