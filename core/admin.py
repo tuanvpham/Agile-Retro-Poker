@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Session, Role, User, Story
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth import get_user_model
 
-models = Session, Role, User, Story
-admin.site.register(models)
+User = get_user_model()
+admin.site.register(User, UserAdmin)
