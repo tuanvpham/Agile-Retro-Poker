@@ -30,6 +30,7 @@ DEBUG = False
 # Development
 ALLOWED_HOSTS = ['eb-django-app-dev.elasticbeanstalk.com','django-env.dkbpzycagm.us-east-2.elasticbeanstalk.com']
 
+
 # Application definition
 
 INSTALLED_APPS = [
