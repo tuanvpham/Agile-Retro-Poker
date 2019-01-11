@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+import datetime
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -132,15 +134,28 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'core.User'
-
-# Change this with authenticated user in production
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
-    ]
-}
+AUTHENTICATION_BACKENDS = (
+    'core.auth_backend.EmailPasswordlessAuthBackend',
+)
 
 # Change this when we have frontend instance
+# CORS_ORIGIN_ALLOW_ALL = False
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+}
+
+JWT_AUTH = {
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'core.views.my_jwt_response_handler'
+}
+
 CORS_ORIGIN_WHITELIST = (
-    'localhost:3000/'
+    'localhost:3000',
 )
