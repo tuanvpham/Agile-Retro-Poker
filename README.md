@@ -9,15 +9,15 @@ These instructions will get you a copy of the project up and running on your loc
 1. Clone project
 2. Install pip (package manager)
 
-	```
-	curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-	sudo python get-pip.py
-	```
+    ```
+    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+    sudo python get-pip.py
+    ```
 3. Install virtualenv (dev environment)
 
-	```
-	pip install virtualenv
-	```
+    ```
+    pip install virtualenv
+    ```
 4. Change directory to project's directory
 5. ```virtualenv env -p python3```
 6. ```source env/bin/activate```
@@ -52,6 +52,8 @@ These instructions will get you a copy of the project up and running on your loc
 1. Coverage
     - Everytime you add some code to the project run this: ```coverage run --source ='.' manage.py test```
     - Read coverage report: ```coverage report```
+2. Jira shell
+    - Play with Jira API: ```jirashell -s jira-board-url```
 
 ## Deployment
 How to deploy...
