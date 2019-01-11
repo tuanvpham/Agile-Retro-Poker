@@ -20,7 +20,6 @@ def current_user(request):
     '''
     Determine the current user by their token, and return their data
     '''
->>>>>>> 5dff889e1c276e60c022780a16a84b3143d060dc
 
     serializer = UserSerializer(request.user)
     return Response(serializer.data)
