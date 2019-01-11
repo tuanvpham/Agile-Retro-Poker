@@ -46,7 +46,7 @@ class UserList(APIView):
         try:
             # Login with Jira Auth
             jac = JIRA(
-                'https://agilecommandcentral.atlassian.net',
+                'https://agilecommandcentralgroup10.atlassian.net',
                 basic_auth=(email, password)
             )
             jac_username = jac.myself().get('displayName')
@@ -81,6 +81,13 @@ class UserList(APIView):
                 )
         except JIRAError as e:
             return Response(status=status.HTTP_408_REQUEST_TIMEOUT)
+
+
+# Test deploy
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def test_deploy(request):
+    return HttpResponse(content='You made it')
 
 
 # Utitlities
