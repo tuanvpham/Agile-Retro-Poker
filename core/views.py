@@ -1,14 +1,14 @@
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
-# from django.contrib.auth import authenticate, login, logout
-# from django.contrib.auth.decorators import login_required
+
 
 from jira import JIRA, JIRAError
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
+from rest_framework.viewsets import ViewSet
 from rest_framework_jwt.settings import api_settings
 
 from .models import *
@@ -26,11 +26,9 @@ def current_user(request):
     return Response(serializer.data)
 
 
-class UserList(APIView):
+class UserAuthentication(APIView):
     '''
-    Login with Jira Auth
-    If user exists in database, return user data and new token
-    Else create new user and return user data
+    Handle authentication with tokens
     '''
 
     permission_classes = (AllowAny,)
@@ -47,7 +45,7 @@ class UserList(APIView):
         try:
             # Login with Jira Auth
             jac = JIRA(
-                'https://agilecommandcentralgroup10.atlassian.net',
+                'https://agilecommandcentralgroup10.atlassian.net/',
                 basic_auth=(email, password)
             )
             jac_username = jac.myself().get('displayName')
@@ -84,6 +82,15 @@ class UserList(APIView):
             return Response(status=status.HTTP_408_REQUEST_TIMEOUT)
 
 
+class SessionViewSet(viewsets.ModelViewSet):
+    '''
+    Set of Session views for listing, retrieving, creating, deleting sessions
+    '''
+
+    queryset = Session.objects.all()
+    serializer_class = SessionSerializer
+
+
 # Test deploy
 @api_view(['GET'])
 @permission_classes((AllowAny, ))
@@ -96,6 +103,7 @@ def my_jwt_response_handler(token, user=None, request=None):
     '''
         Return response includes token, email, username
     '''
+
     return {
         'token': token,
         'user': UserSerializer(user, context={'request': request}).data

@@ -40,15 +40,16 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
+    'rest_framework',
+    'corsheaders',
+    'core',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
-    'corsheaders',
-    'core'
 ]
 
 MIDDLEWARE = [
@@ -157,9 +158,20 @@ REST_FRAMEWORK = {
 }
 
 JWT_AUTH = {
-    'JWT_RESPONSE_PAYLOAD_HANDLER': 'core.views.my_jwt_response_handler'
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'core.views.my_jwt_response_handler',
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=2),
 }
 
 CORS_ORIGIN_WHITELIST = (
     'localhost:3000',
 )
+
+ASGI_APPLICATION = "agilecommandcentral.routing.application"
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
