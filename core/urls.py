@@ -15,6 +15,6 @@ urlpatterns = [
     path('current_user/', views.current_user),
     path('users/', views.UserAuthentication.as_view()),
     url(r'^', include(router.urls)),
-    # url(r'^$', views.home, name='home'),
-    # url(r'^(?P<session_name>[^/]+)/$', views.session, name='session'),
+    path('users/', views.UserList.as_view()),
+    path('deploy/', views.test_deploy)
 ]

@@ -11,7 +11,6 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 from rest_framework_jwt.settings import api_settings
 
-
 from .models import *
 from .serializers import *
 
@@ -92,21 +91,11 @@ class SessionViewSet(viewsets.ModelViewSet):
     serializer_class = SessionSerializer
 
 
-# def home(request):
-#     '''
-#     Return sessions and allow user create new sessions
-#     '''
-
-#     pass
-
-
-# def session(request, session_name):
-#     '''
-#     Determine which session (channel) user belongs to
-#     and emit messages to all users on the channel
-#     '''
-
-#     pass
+# Test deploy
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def test_deploy(request):
+    return HttpResponse(content='You made it')
 
 
 # Utitlities
