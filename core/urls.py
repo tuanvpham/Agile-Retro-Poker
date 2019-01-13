@@ -11,7 +11,6 @@ router.register(r'sessions', views.SessionViewSet, basename='session')
 
 
 urlpatterns = [
-    path('token-auth/', obtain_jwt_token),
     path('current-user/', views.current_user),
     path('users/', views.UserAuthentication.as_view()),
     url(r'^', include(router.urls)),
