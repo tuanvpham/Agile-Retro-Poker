@@ -4,27 +4,21 @@ An application that holds all features needed for the agile methodology that int
 ## Getting Started
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-### Installing
+### Installation
 #### Django
 1. Clone project
-2. Install pip (package manager)
-
-    ```
-    curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-    sudo python get-pip.py
-    ```
-3. Install virtualenv (dev environment)
+2. Install virtualenv
 
     ```
     pip install virtualenv
     ```
-4. Change directory to project's directory
-5. ```virtualenv env -p python3```
-6. ```source env/bin/activate```
-7. ```pip install -r requirements.txt```
-8. ```python manage.py migrate```
-9. To run the app: ```python manage.py runserver```
-10. You will see a portal to the project on terminal (something like http://127.0.0.1:8000/).
+3. Change directory to project's directory
+4. ```virtualenv env -p python3```
+5. ```source env/bin/activate```
+6. ```pip install -r requirements.txt```
+7. ```python manage.py migrate```
+8. To run the app: ```python manage.py runserver```
+9. You will see a portal to the project on terminal (something like http://127.0.0.1:8000/).
 
 #### Pep8 Style Guide
 - Visual Studio Code: https://code.visualstudio.com/docs/python/linting
