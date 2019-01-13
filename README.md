@@ -7,12 +7,12 @@ These instructions will get you a copy of the project up and running on your loc
 ### Installation
 #### Django
 1. Clone project
-2. Install virtualenv
+2. Install virtualenv (make sure you have pip on your machine)
 
     ```
     pip install virtualenv
     ```
-3. Change directory to project's directory
+3. ```cd Group10-Agile-Command-Central-API```
 4. ```virtualenv env -p python3```
 5. ```source env/bin/activate```
 6. ```pip install -r requirements.txt```
