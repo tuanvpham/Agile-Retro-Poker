@@ -1,7 +1,3 @@
 option_settings:
   aws:elasticbeanstalk:container:python:
     WSGIPath: agilecommandcentral/wsgi.py
-
-commands:
-  WSGIPassAuthorization:
-    command: sed -i.bak '/WSGIScriptAlias/ a WSGIPassAuthorization On' config.py
