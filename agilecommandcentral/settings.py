@@ -28,7 +28,7 @@ SECRET_KEY = 'nokc_1a3rphmia4g*gxu!ho80rv4dqo*kabm(10jrvhd4g*$6e'
 DEBUG = True
 
 # Development
-ALLOWED_HOSTS = ['eb-django-app-dev.elasticbeanstalk.com','django-env.dkbpzycagm.us-east-2.elasticbeanstalk.com']
+ALLOWED_HOSTS = ['*']
 
 
 
