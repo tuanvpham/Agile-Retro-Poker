@@ -25,10 +25,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'nokc_1a3rphmia4g*gxu!ho80rv4dqo*kabm(10jrvhd4g*$6e'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -85,10 +85,10 @@ WSGI_APPLICATION = 'agilecommandcentral.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'agilecommandcentral',
-        'USER': 'group10',
-        'PASSWORD': 'password',
-        'HOST': 'localhost',
+        'NAME': 'KyleDBAdmin',
+        'USER': 'KyleDBAdmin',
+        'PASSWORD': 'KyleCaKeFaRt100!!',
+        'HOST': 'dacc.cn6ier2gilv6.us-east-2.rds.amazonaws.com',
         'PORT': '',
     }
 }
