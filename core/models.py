@@ -28,6 +28,11 @@ class TrackableDateModel(models.Model):
 class Session(models.Model):
    title = models.CharField(max_length=30)
    description = models.CharField(max_length=100, null=True, blank=True)
+   TYPES = (
+        ('R', 'Retro'),
+        ('P', 'Poker'),
+    )
+   type = models.CharField(max_length=10, null=True, choices=TYPES)
    owner = models.ForeignKey(
        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True
    )
