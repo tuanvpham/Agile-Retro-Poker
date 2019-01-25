@@ -30,10 +30,7 @@ DEBUG = True
 # Development
 ALLOWED_HOSTS = ['*']
 
-
-
 # Application definition
-
 INSTALLED_APPS = [
     'channels',
     'rest_framework',
@@ -86,10 +83,10 @@ WSGI_APPLICATION = 'agilecommandcentral.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'KyleDBAdmin',
-        'USER': 'KyleDBAdmin',
-        'PASSWORD': 'KyleCaKeFaRt100!!',
-        'HOST': 'dacc.cn6ier2gilv6.us-east-2.rds.amazonaws.com',
+        'NAME': 'agilecommandcentral',
+        'USER': 'group10',
+        'PASSWORD': 'password',
+        'HOST': 'localhost',
         'PORT': '',
     }
 }
@@ -153,7 +150,7 @@ REST_FRAMEWORK = {
 }
 
 JWT_AUTH = {
-    'JWT_RESPONSE_PAYLOAD_HANDLER': 'core.views.my_jwt_response_handler',
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'core.utilities.my_jwt_response_handler',
     'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=2),
 }
 

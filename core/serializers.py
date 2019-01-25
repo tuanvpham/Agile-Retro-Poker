@@ -9,14 +9,7 @@ class SessionSerializer(serializers.ModelSerializer):
         fields = ('id', 'title')
 
 
-class RoleSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Role
-        fields = ('id', 'title')
-
-
 class UserSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
         fields = ('username', 'email',)

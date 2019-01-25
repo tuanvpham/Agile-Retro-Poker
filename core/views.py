@@ -9,10 +9,11 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
-from rest_framework_jwt.settings import api_settings
 
 from .models import *
 from .serializers import *
+from .utilities import *
+
 
 # Rest API View
 @api_view(['GET'])
@@ -81,41 +82,8 @@ class UserAuthentication(APIView):
             return Response(status=status.HTTP_408_REQUEST_TIMEOUT)
 
 
-class SessionViewSet(viewsets.ModelViewSet):
-    '''
-    Set of Session views for listing, retrieving, creating, deleting sessions
-    '''
-
-    queryset = Session.objects.all()
-    serializer_class = SessionSerializer
-
-
 # Test deploy
 @api_view(['GET'])
 @permission_classes((AllowAny, ))
 def test_deploy(request):
     return HttpResponse(content='You made it')
-
-
-# Utitlities
-def my_jwt_response_handler(token, user=None, request=None):
-    '''
-        Return response includes token, email, username
-    '''
-
-    return {
-        'token': token,
-        'user': UserSerializer(user, context={'request': request}).data
-    }
-
-
-def generate_new_token(user):
-    '''
-        Return token for authenticated user
-    '''
-    jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
-    jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
-
-    payload = jwt_payload_handler(user)
-    token = jwt_encode_handler(payload)
-    return token

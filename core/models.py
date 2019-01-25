@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
 
 AbstractUser._meta.get_field('email')._unique = True
@@ -12,22 +13,59 @@ class UsernameValidatorAllowSpace(UnicodeUsernameValidator):
     regex = r'^[\w.@+\- ]+$'
 
 
+class TrackableDateModel(models.Model):
+    '''
+    Abstract model to Track the creation/updated date for a model.
+    '''
+
+    create_date = models.DateTimeField(auto_now_add=True)
+    update_date = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
 class Session(models.Model):
     title = models.CharField(max_length=30)
-
-    def __str__(self):
-        return self.title
-
-
-class Role(models.Model):
-    ROLES = (
-        ('H', 'Host'),
-        ('A', 'Attendee'),
+    description = models.CharField(max_length=100, null=True, blank=True)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True
     )
-    title = models.CharField(max_length=30, choices=ROLES, null=True)
 
-    def __str__(self):
-        return self.title
+    @property
+    def group_name(self):
+        '''
+        Returns the Channels Group name that sockets should subscribe to to get sent
+        messages as they are generated.
+        '''
+        return "session-%s" % self.id
+
+
+class RetroActionItems(TrackableDateModel):
+    '''
+    Store action items of Retro Board
+    '''
+
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT
+    )
+    session = models.ForeignKey(
+        Session, on_delete=models.PROTECT
+    )
+    action_item_text = models.TextField(max_length=2000)
+
+
+class SessionMember(TrackableDateModel):
+    '''
+    Store all users from a session
+    '''
+
+    session = models.ForeignKey(
+        Session, on_delete=models.PROTECT
+    )
+    member = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT
+    )
 
 
 class User(AbstractUser):
@@ -39,8 +77,6 @@ class User(AbstractUser):
             'Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.'),
         validators=[username_validator],
     )
-    role = models.ForeignKey(Role, on_delete=models.CASCADE, null=True)
-    session = models.ForeignKey(Session, on_delete=models.CASCADE, null=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
