@@ -92,14 +92,8 @@ class SessionViewSet(viewsets.ModelViewSet):
 
 class SessionCreate(APIView):
     '''
-    Handles creation of new session
+    Fetch and create sessions
     '''
-
-    def get_object(self, id):
-        try:
-            return Session.objects.get(id)
-        except Session.DoesNotExist:
-            return None
 
     def get(self, request, format=None):
         sessions = Session.objects.all()
