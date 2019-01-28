@@ -7,18 +7,16 @@ These instructions will get you a copy of the project up and running on your loc
 ### Installation
 #### Django
 1. Clone project
-2. Install virtualenv (make sure you have pip on your machine)
-
-    ```
-    pip install virtualenv
-    ```
+2. ```pip install virtualenv``` (*)
 3. ```cd Group10-Agile-Command-Central-API```
-4. ```virtualenv env -p python3```
+4. ```virtualenv env -p python3``` (*)
 5. ```source env/bin/activate```
 6. ```pip install -r requirements.txt```
 7. ```python manage.py migrate```
-8. To run the app: ```python manage.py runserver```
-9. You will see a portal to the project on terminal (something like http://127.0.0.1:8000/).
+8. Install Pep8, MySQL, Redis (*)
+9. ```python manage.py runserver```
+
+Note: * skip this step if this is not the first time you set up the project
 
 #### Pep8 Style Guide
 - Visual Studio Code: https://code.visualstudio.com/docs/python/linting
@@ -36,11 +34,9 @@ These instructions will get you a copy of the project up and running on your loc
 5. ```CREATE USER group10@localhost IDENTIFIED BY 'password';```
 6. ```GRANT ALL PRIVILEGES ON agilecommandcentral.* TO group10@localhost;```
 
-- From agilecommandcentral project directory, run 
-1. ```python manage.py makemigrations```
-2. ```python manage.py migrate```
-3. ```python manage.py runserver```
-
+#### Redis for Django Channels (Linux)
+- ```brew install redis```
+- ```brew services start redis```
 
 ## Running tests
 1. Coverage
