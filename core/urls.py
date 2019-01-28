@@ -7,13 +7,11 @@ from . import views
 
 
 router = DefaultRouter()
-router.register(r'sessions', views.SessionViewSet, basename='session')
 
 
 urlpatterns = [
     path('current-user/', views.current_user),
     path('users/', views.UserAuthentication.as_view()),
     path('sessions/', views.SessionCreate.as_view()), 
-    url(r'^', include(router.urls)),
     path('deploy/', views.test_deploy)
 ]
