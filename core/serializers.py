@@ -6,7 +6,7 @@ from .models import *
 class SessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Session
-        fields = ('id', 'title', 'description', 'type', 'owner')
+        fields = ('id', 'title', 'description', 'session_type', 'owner')
 
     def create(self, validated_data):
         return Session.objects.create(**validated_data)
