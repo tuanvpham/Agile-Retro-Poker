@@ -31,9 +31,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 
-
 # Application definition
-
 INSTALLED_APPS = [
     'channels',
     'rest_framework',
@@ -137,9 +135,6 @@ AUTH_USER_MODEL = 'core.User'
 AUTHENTICATION_BACKENDS = (
     'core.auth_backend.EmailPasswordlessAuthBackend',
 )
-
-# Change this when we have frontend instance
-# CORS_ORIGIN_ALLOW_ALL = False
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (

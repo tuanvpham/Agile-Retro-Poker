@@ -4,7 +4,7 @@ env
 *.pyc
 __pycache__/
 *.sqlite3
-
+get-pip.py
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
