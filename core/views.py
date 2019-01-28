@@ -14,6 +14,7 @@ from rest_framework_jwt.settings import api_settings
 from .models import *
 from .serializers import *
 
+
 # Rest API View
 @api_view(['GET'])
 def current_user(request):
@@ -41,53 +42,78 @@ class UserAuthentication(APIView):
     def post(self, request, format=None):
         email = request.data['email']
         password = request.data['password']
+        response_data = ({
+            'message': "Unknown error"
+        })
+        status_code = status.HTTP_400_BAD_REQUEST
         try:
             # Login with Jira Auth
             jac = JIRA(
-                'https://agilecommandcentralgroup10.atlassian.net/',
-                basic_auth=(email, password)
+                'https://agilecommandcentralgroup10.atlassian.net',
+                basic_auth=(email, password),
+                max_retries=1, timeout=5
             )
             jac_username = jac.myself().get('displayName')
             user = self.get_object(email)
             if user is None:
                 # Signup with ACC
+                # convert the user data to a byte stream
                 serializer = UserSerializerWithToken(data={
                     'email': email,
                     'username': jac_username,
                     'password': password
                 })
+                # if it is possible to deserialize the data then success
                 if serializer.is_valid():
                     serializer.save()
-                    return Response(
-                        serializer.data,
-                        status=status.HTTP_201_CREATED
-                    )
-                return Response(
-                    serializer.errors,
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                    response_data = ({
+                        'message': "Successfully logged in user for the first time"
+                    })
+                    response_data = {**response_data, **serializer.data}
+                    status_code = status.HTTP_201_CREATED
+                # otherwise get the errors
+                else:
+                    response_data = ({
+                        'message': "There was a problem creating the details for this user"
+                    })
+                    response_data = {**response_data, **serializer.errors}
+                    status_code = status.HTTP_400_BAD_REQUEST
             else:
+                # generate a token for the session if the credentials were valid
                 token = generate_new_token(user)
-                user_existed_data = {
+                user_data = ({
                     'token': token,
                     'email': user.email,
                     'username': user.username
-                }
-                return Response(
-                    user_existed_data,
-                    status=status.HTTP_200_OK
-                )
+                })
+                response_data = ({
+                    'message': "Successfully logged in",
+                })
+                response_data = {**response_data, **user_data}
+                status_code = status.HTTP_200_OK
         except JIRAError as e:
-            return Response(status=status.HTTP_408_REQUEST_TIMEOUT)
-
-
-class SessionViewSet(viewsets.ModelViewSet):
-    '''
-    Set of Session views for listing, retrieving, creating, deleting sessions
-    '''
-
-    queryset = Session.objects.all()
-    serializer_class = SessionSerializer
+            if e.status_code == 401:
+                response_data = ({
+                    'message': "Wrong username/password",
+                })
+                status_code = status.HTTP_401_UNAUTHORIZED
+            elif e.status_code == 408:
+                response_data = ({
+                    'message': "The request timed out during authentication with Jira",
+                })
+                status_code = status.HTTP_408_REQUEST_TIMEOUT
+            elif e.status_code == 500:
+                response_data = ({
+                    'message': "There was an internal server error",
+                })
+                status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            else:
+                response_data = ({
+                    'message': "Unknown error",
+                })
+                status_code = status.HTTP_400_BAD_REQUEST
+        finally:
+            return Response(response_data, status=status_code)
 
 
 # Test deploy
