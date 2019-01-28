@@ -149,7 +149,7 @@ REST_FRAMEWORK = {
 
 JWT_AUTH = {
     'JWT_RESPONSE_PAYLOAD_HANDLER': 'core.views.my_jwt_response_handler',
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=2),
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=2),
 }
 
 
