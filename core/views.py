@@ -116,6 +116,30 @@ class UserAuthentication(APIView):
             return Response(response_data, status=status_code)
 
 
+class SessionCreate(APIView):
+    '''
+    Fetch and create sessions
+    '''
+
+    def get(self, request, format=None):
+        sessions = Session.objects.all()
+        sessionSerializer = SessionSerializer(sessions, many=True)
+        return Response(sessionSerializer.data)
+
+    def post(self, request, format=None):
+        sessionSerializer = SessionSerializer(data=request.data)
+        if sessionSerializer.is_valid():
+            sessionSerializer.save()
+            return Response(
+                sessionSerializer.data,
+                status=status.HTTP_201_CREATED
+            )
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
 # Test deploy
 @api_view(['GET'])
 @permission_classes((AllowAny, ))
