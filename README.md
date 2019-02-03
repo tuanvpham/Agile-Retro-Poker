@@ -52,21 +52,22 @@ Note: * skip this step if this is not the first time you set up the project
 
 2. Make API calls
 
+![api call](/postman_apicall_2.png)
 ![api call](/postman_apicall.png)
 
 ## Deployment
 How to deploy...
 
 ## Built With
-* Django - Web framework
-* React - Front End
+* Django - Backend API
+* React - Frontend Web
 * Jira API - Integration
 * AWS - Deployment
 * iOS - Mobile Development
 
 ## Authors
-* Katherine Rosenfeld - Front End
-* Kyle Capehart - Database, AWS, Jira API
-* Lee Alan Wildes - AWS, Front End
+* Katherine Rosenfeld - Frontend Web
+* Kyle Capehart - Database, Jira API
+* Lee Alan Wildes - AWS
 * Leonardo Araque - Mobile Development
-* Tuan Pham - Backend, REST API, Jira API
+* Tuan Pham - Backend API
