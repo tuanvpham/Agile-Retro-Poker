@@ -39,11 +39,20 @@ Note: * skip this step if this is not the first time you set up the project
 - ```brew services start redis```
 
 ## Running tests
-1. Coverage
+- Coverage
     - Everytime you add some code to the project run this: ```coverage run --source ='.' manage.py test```
     - Read coverage report: ```coverage report```
-2. Jira shell
+- Jira shell
     - Play with Jira API: ```jirashell -s jira-board-url```
+
+## Postman API calls
+1. API Login
+
+![login api](/postman_login.png)
+
+2. Make API calls
+
+![api call](/postman_apicall.png)
 
 ## Deployment
 How to deploy...
