@@ -1,9 +1,5 @@
-from django.http import HttpResponse
-from django.shortcuts import render, get_object_or_404, redirect
-
-
 from jira import JIRA, JIRAError
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, generics
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -141,6 +137,11 @@ class SessionCreate(APIView):
             session_serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
+
+
+class SessionMemberList(generics.ListAPIView):
+    queryset = SessionMember.objects.all()
+    serializer_class = SessionMemberSerializer
 
 
 # Test deploy

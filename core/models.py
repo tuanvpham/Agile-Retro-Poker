@@ -32,9 +32,9 @@ class Session(models.Model):
             ('R', 'Retro'),
             ('P', 'Poker'),
         )
-    session_type = models.CharField(max_length=10, null=True, choices=TYPES)
+    session_type = models.CharField(max_length=10, choices=TYPES)
     owner = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
     )
 
     @property
