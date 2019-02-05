@@ -3,15 +3,6 @@ from rest_framework_jwt.settings import api_settings
 from .models import *
 
 
-class SessionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Session
-        fields = ('id', 'title', 'description', 'session_type', 'owner')
-
-    def create(self, validated_data):
-        return Session.objects.create(**validated_data)
-
-
 class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -42,6 +33,59 @@ class UserSerializerWithToken(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('token', 'email', 'username', 'password')
+
+
+class SessionSerializer(serializers.ModelSerializer):
+    session_owner_id = serializers.SerializerMethodField(
+        'get_owner_id'
+    )
+    session_owner_username = serializers.SerializerMethodField(
+        'get_owner_username'
+    )
+    session_owner_email = serializers.SerializerMethodField(
+        'get_owner_email'
+    )
+
+    def create(self, validated_data):
+        request = self._context.get("request")
+        session = Session.objects.create(
+            **validated_data,
+            owner=request.user
+        )
+        session.save()
+        return session
+
+    def get_owner_id(self, obj):
+        try:
+            owner_obj = User.objects.get(id=obj.owner.id)
+            owner_id = owner_obj.id
+        except User.DoesNotExist:
+            owner_id = -1
+        return owner_id
+
+    def get_owner_username(self, obj):
+        try:
+            owner_obj = User.objects.get(id=obj.owner.id)
+            owner_username = owner_obj.username
+        except User.DoesNotExist:
+            owner_username = ''
+        return owner_username
+
+    def get_owner_email(self, obj):
+        try:
+            owner_obj = User.objects.get(id=obj.owner.id)
+            owner_email = owner_obj.email
+        except User.DoesNotExist:
+            owner_email = ''
+        return owner_email
+
+    class Meta:
+        model = Session
+        fields = (
+            'id', 'title', 'description',
+            'session_type', 'session_owner_id', 'session_owner_username',
+            'session_owner_email'
+        )
 
 
 class StorySerializer(serializers.ModelSerializer):

@@ -123,19 +123,22 @@ class SessionCreate(APIView):
 
     def get(self, request, format=None):
         sessions = Session.objects.all()
-        sessionSerializer = SessionSerializer(sessions, many=True)
-        return Response(sessionSerializer.data)
+        session_serializer = SessionSerializer(sessions, many=True)
+        return Response(session_serializer.data)
 
     def post(self, request, format=None):
-        sessionSerializer = SessionSerializer(data=request.data)
-        if sessionSerializer.is_valid():
-            sessionSerializer.save()
+        session_serializer = SessionSerializer(
+            data=request.data,
+            context={'request': request}
+        )
+        if session_serializer.is_valid():
+            session_serializer.save()
             return Response(
-                sessionSerializer.data,
+                session_serializer.data,
                 status=status.HTTP_201_CREATED
             )
         return Response(
-            serializer.errors,
+            session_serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
 
