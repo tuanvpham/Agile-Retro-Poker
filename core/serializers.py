@@ -36,15 +36,9 @@ class UserSerializerWithToken(serializers.ModelSerializer):
 
 
 class SessionSerializer(serializers.ModelSerializer):
-    session_owner_id = serializers.SerializerMethodField(
-        'get_owner_id'
-    )
-    session_owner_username = serializers.SerializerMethodField(
-        'get_owner_username'
-    )
-    session_owner_email = serializers.SerializerMethodField(
-        'get_owner_email'
-    )
+    owner_id = serializers.SerializerMethodField()
+    owner_username = serializers.SerializerMethodField()
+    owner_email = serializers.SerializerMethodField()
 
     def create(self, validated_data):
         request = self._context.get("request")
@@ -82,13 +76,58 @@ class SessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Session
         fields = (
-            'id', 'title', 'description',
-            'session_type', 'session_owner_id', 'session_owner_username',
-            'session_owner_email'
+            'id',
+            'title',
+            'description',
+            'session_type',
+            'owner_id',
+            'owner_username',
+            'owner_email'
+        )
+
+
+class SessionMemberSerializer(serializers.ModelSerializer):
+    session_member_id = serializers.SerializerMethodField()
+    session_member_username = serializers.SerializerMethodField()
+    session_member_email = serializers.SerializerMethodField()
+
+    def get_session_member_id(self, obj):
+        try:
+            session_member = User.objects.get(id=obj.member.id)
+            session_member_id = session_member.id
+        except User.DoesNotExist:
+            session_member_id = -1
+        return session_member_id
+
+    def get_session_member_username(self, obj):
+        try:
+            session_member = User.objects.get(id=obj.member.id)
+            session_member_username = session_member.username
+        except User.DoesNotExist:
+            session_member_username = ''
+        return session_member_username
+
+    def get_session_member_email(self, obj):
+        try:
+            session_member = User.objects.get(id=obj.member.id)
+            session_member_email = session_member.email
+        except User.DoesNotExist:
+            session_member_email = ''
+        return session_member_email
+
+    class Meta:
+        model = SessionMember
+        fields = (
+            'id',
+            'session',
+            'session_member_id',
+            'session_member_username',
+            'session_member_email'
         )
 
 
 class StorySerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Story
         fields = ('id', 'title', 'description', 'story_points', 'session')

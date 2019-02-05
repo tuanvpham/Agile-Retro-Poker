@@ -13,5 +13,6 @@ urlpatterns = [
     path('current-user/', views.current_user),
     path('users/', views.UserAuthentication.as_view()),
     path('sessions/', views.SessionCreate.as_view()),
+    path('session-members/', views.SessionMemberList.as_view()),
     path('deploy/', views.test_deploy)
 ]
