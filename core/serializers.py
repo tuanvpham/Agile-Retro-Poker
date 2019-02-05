@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from rest_framework_jwt.settings import api_settings
 from .models import *
-import json
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -37,7 +36,9 @@ class UserSerializerWithToken(serializers.ModelSerializer):
 
 
 class SessionSerializer(serializers.ModelSerializer):
-    session_owner_id = serializers.SerializerMethodField('get_owner_id')
+    session_owner_id = serializers.SerializerMethodField(
+        'get_owner_id'
+    )
     session_owner_username = serializers.SerializerMethodField(
         'get_owner_username'
     )
