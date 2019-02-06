@@ -38,6 +38,9 @@ Note: * skip this step if this is not the first time you set up the project
 - ```brew install redis```
 - ```brew services start redis```
 
+#### Redis (Windows)
+- https://www.youtube.com/watch?v=ncFhlv-gBXQ
+
 ## Running tests
 - Coverage
     - Everytime you add some code to the project run this: ```coverage run --source ='.' manage.py test```
