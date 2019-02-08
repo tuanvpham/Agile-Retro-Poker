@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 
 
 from jira import JIRA, JIRAError
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, generics
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -80,6 +80,16 @@ class UserAuthentication(APIView):
                 )
         except JIRAError as e:
             return Response(status=status.HTTP_408_REQUEST_TIMEOUT)
+
+
+class RetroActionItemsList(generics.ListAPIView):
+    queryset = RetroActionItems.objects.all()
+    serializer_class = RetroActionItemsSerializer
+
+
+class RetroBoardItemsList(generics.ListAPIView):
+    queryset = RetroBoardItems.objects.all()
+    serializer_class = RetroBoardItemsSerializer
 
 
 # Test deploy

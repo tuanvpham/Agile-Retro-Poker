@@ -25,6 +25,22 @@ class TrackableDateModel(models.Model):
         abstract = True
 
 
+class User(AbstractUser):
+    username_validator = UsernameValidatorAllowSpace()
+    username = models.CharField(
+        _('username'),
+        max_length=150,
+        help_text=_(
+            'Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.'),
+        validators=[username_validator],
+    )
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
+
+    def __str__(self):
+        return self.username
+
+
 class Session(models.Model):
     title = models.CharField(max_length=30)
     description = models.CharField(max_length=100, null=True, blank=True)
@@ -41,20 +57,6 @@ class Session(models.Model):
         return "session-%s" % self.id
 
 
-class RetroActionItems(TrackableDateModel):
-    '''
-    Store action items of Retro Board
-    '''
-
-    owner = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT
-    )
-    session = models.ForeignKey(
-        Session, on_delete=models.PROTECT
-    )
-    action_item_text = models.TextField(max_length=2000)
-
-
 class SessionMember(TrackableDateModel):
     '''
     Store all users from a session
@@ -68,20 +70,56 @@ class SessionMember(TrackableDateModel):
     )
 
 
-class User(AbstractUser):
-    username_validator = UsernameValidatorAllowSpace()
-    username = models.CharField(
-        _('username'),
-        max_length=150,
-        help_text=_(
-            'Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.'),
-        validators=[username_validator],
+class RetroActionItems(TrackableDateModel):
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT
     )
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
+    session = models.ForeignKey(
+        Session, on_delete=models.PROTECT
+    )
+    action_item_text = models.TextField(max_length=2000)
 
-    def __str__(self):
-        return self.username
+
+class RetroWhatWentWell(TrackableDateModel):
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT
+    )
+    session = models.ForeignKey(
+        Session, on_delete=models.PROTECT
+    )
+    what_went_well_text = models.TextField(max_length=2000)
+
+
+class RetroWhatDidNot(TrackableDateModel):
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT
+    )
+    session = models.ForeignKey(
+        Session, on_delete=models.PROTECT
+    )
+    what_did_not_text = models.TextField(max_length=2000)
+
+
+class RetroBoardItems(TrackableDateModel):
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT
+    )
+    session = models.ForeignKey(
+        Session, on_delete=models.PROTECT
+    )
+    RETRO_BOARD_ITEMS_CHOICES = (
+        ('WWW', 'What Went Well'),
+        ('WDN', 'What Did Not'),
+        ('AI', 'Action Items')
+    )
+    item_type = models.CharField(
+        max_length=3,
+        choices=RETRO_BOARD_ITEMS_CHOICES,
+        default='AI'
+    )
+    item_text = models.TextField(
+        max_length=2000,
+    )
 
 
 class Story(models.Model):

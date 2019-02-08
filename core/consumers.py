@@ -7,7 +7,7 @@ import json
 
 class SessionConsumer(WebsocketConsumer):
     def connect(self):
-        print(self.scope['url_route']['kwargs']['session_name'])
+        print('CONNECT')
         session = get_session_object(
             self.scope['url_route']['kwargs']['session_name']
         )
@@ -30,6 +30,7 @@ class SessionConsumer(WebsocketConsumer):
 
             self.accept()
         else:
+            print('DISCONNECT')
             self.close()
 
     def disconnect(self, close_code):
@@ -43,33 +44,59 @@ class SessionConsumer(WebsocketConsumer):
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
         print(text_data_json)
-        message = text_data_json['actionItemText']
+        item_type = text_data_json['itemType']
+        item_text = text_data_json['itemText']
 
         session = get_session_object(
             self.scope['url_route']['kwargs']['session_name']
         )
-        retro_action_item = RetroActionItems.objects.create(
-            owner=self.scope['user'],
-            session=session,
-            action_item_text=message
-        )
-        retro_action_item.save()
+
+        if item_type == 'what_went_well':
+            retro_board_item = RetroBoardItems.objects.create(
+                owner=self.scope['user'],
+                session=session,
+                item_type='WWW',
+                item_text=item_text
+            )
+            retro_board_item.save()
+        elif item_type == 'what_did_not':
+            retro_board_item = RetroBoardItems.objects.create(
+                owner=self.scope['user'],
+                session=session,
+                item_type='WDN',
+                item_text=item_text
+            )
+            retro_board_item.save()
+        else:
+            retro_board_item = RetroBoardItems.objects.create(
+                owner=self.scope['user'],
+                session=session,
+                item_type='AI',
+                item_text=item_text
+            )
+            retro_board_item.save()
 
         # Send message to room group
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
             {
-                'type': 'chat_message',
-                'message': message
+                'type': 'send_out_retro_board_item_to_websocket',
+                'item_id': retro_board_item.id,
+                'item_owner': self.scope['user'].username,
+                'item_type': retro_board_item.item_type,
+                'item_text': item_text
             }
         )
 
-    # Receive message from session
-    def chat_message(self, event):
-        message = event['message']
+    def send_out_retro_board_item_to_websocket(self, event):
+        item_id = event['item_id']
+        item_owner = event['item_owner']
+        item_type = event['item_type']
+        item_text = event['item_text']
 
-        # Send message to WebSocket
-        # self.send(text_data=json.dumps({
-        #     'message': message
-        # }))
-        self.send(text_data=message)
+        self.send(text_data=json.dumps({
+            'item_id': item_id,
+            'item_owner': item_owner,
+            'item_type': item_type,
+            'item_text':  item_text
+        }))
