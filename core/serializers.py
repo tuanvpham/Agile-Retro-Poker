@@ -40,54 +40,6 @@ class SessionSerializer(serializers.ModelSerializer):
         fields = ('id', 'title')
 
 
-class RetroActionItemsSerializer(serializers.ModelSerializer):
-    owner_username = serializers.SerializerMethodField()
-
-    def get_owner_username(self, obj):
-        try:
-            owner_obj = User.objects.get(id=obj.owner.id)
-            owner_username = owner_obj.username
-        except User.DoesNotExist:
-            owner_username = ''
-        return owner_username
-
-    class Meta:
-        model = RetroActionItems
-        fields = ('id', 'owner_username', 'action_item_text')
-
-
-class RetroWhatWentWellSerializer(serializers.ModelSerializer):
-    owner_username = serializers.SerializerMethodField()
-
-    def get_owner_username(self, obj):
-        try:
-            owner_obj = User.objects.get(id=obj.owner.id)
-            owner_username = owner_obj.username
-        except User.DoesNotExist:
-            owner_username = ''
-        return owner_username
-
-    class Meta:
-        model = RetroWhatWentWell
-        fields = ('id', 'owner_username', 'what_went_well_text')
-
-
-class RetroWhatWentWellSerializer(serializers.ModelSerializer):
-    owner_username = serializers.SerializerMethodField()
-
-    def get_owner_username(self, obj):
-        try:
-            owner_obj = User.objects.get(id=obj.owner.id)
-            owner_username = owner_obj.username
-        except User.DoesNotExist:
-            owner_username = ''
-        return owner_username
-
-    class Meta:
-        model = RetroWhatWentWell
-        fields = ('id', 'owner_username', 'what_went_well_text')
-
-
 class RetroBoardItemsSerializer(serializers.ModelSerializer):
     owner_username = serializers.SerializerMethodField()
     session_title = serializers.SerializerMethodField()
