@@ -42,7 +42,7 @@ class User(AbstractUser):
 
 
 class Session(models.Model):
-    title = models.CharField(max_length=30)
+    title = models.CharField(max_length=30, unique=True)
     description = models.CharField(max_length=100, null=True, blank=True)
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True
@@ -63,49 +63,19 @@ class SessionMember(TrackableDateModel):
     '''
 
     session = models.ForeignKey(
-        Session, on_delete=models.PROTECT
+        Session, on_delete=models.CASCADE
     )
     member = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
     )
-
-
-class RetroActionItems(TrackableDateModel):
-    owner = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT
-    )
-    session = models.ForeignKey(
-        Session, on_delete=models.PROTECT
-    )
-    action_item_text = models.TextField(max_length=2000)
-
-
-class RetroWhatWentWell(TrackableDateModel):
-    owner = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT
-    )
-    session = models.ForeignKey(
-        Session, on_delete=models.PROTECT
-    )
-    what_went_well_text = models.TextField(max_length=2000)
-
-
-class RetroWhatDidNot(TrackableDateModel):
-    owner = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT
-    )
-    session = models.ForeignKey(
-        Session, on_delete=models.PROTECT
-    )
-    what_did_not_text = models.TextField(max_length=2000)
 
 
 class RetroBoardItems(TrackableDateModel):
     owner = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
     )
     session = models.ForeignKey(
-        Session, on_delete=models.PROTECT
+        Session, on_delete=models.CASCADE
     )
     RETRO_BOARD_ITEMS_CHOICES = (
         ('WWW', 'What Went Well'),
