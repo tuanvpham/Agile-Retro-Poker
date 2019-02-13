@@ -9,7 +9,7 @@ from . import views
 urlpatterns = [
     path('current-user/', views.current_user),
     path('users/', views.UserAuthentication.as_view()),
-    path('retro-action-items/', views.RetroActionItemsList.as_view()),
     path('retro-board-items/', views.RetroBoardItemsList.as_view()),
+    path('session-owner/', views.check_session_owner),
     path('deploy/', views.test_deploy)
 ]

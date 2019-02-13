@@ -82,14 +82,28 @@ class UserAuthentication(APIView):
             return Response(status=status.HTTP_408_REQUEST_TIMEOUT)
 
 
-class RetroActionItemsList(generics.ListAPIView):
-    queryset = RetroActionItems.objects.all()
-    serializer_class = RetroActionItemsSerializer
-
-
 class RetroBoardItemsList(generics.ListAPIView):
+    '''
+    Returns all retro board items
+    '''
+
     queryset = RetroBoardItems.objects.all()
     serializer_class = RetroBoardItemsSerializer
+
+
+@api_view(['POST'])
+def check_session_owner(request):
+    current_session = Session.objects.get(title=request.data['session_title'])
+    if request.user == current_session.owner:
+        data = {
+            'is_owner': True
+        }
+    else:
+        data = {
+            'is_owner': False
+        }
+
+    return Response(data)
 
 
 # Test deploy
