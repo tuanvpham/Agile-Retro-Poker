@@ -5,10 +5,11 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
-from rest_framework_jwt.settings import api_settings
 
 from .models import *
 from .serializers import *
+from .utilities import *
+
 
 
 # Rest API View
@@ -112,6 +113,30 @@ class UserAuthentication(APIView):
             return Response(response_data, status=status_code)
 
 
+class RetroBoardItemsList(generics.ListAPIView):
+    '''
+    Returns all retro board items
+    '''
+
+    queryset = RetroBoardItems.objects.all()
+    serializer_class = RetroBoardItemsSerializer
+
+
+@api_view(['POST'])
+def check_session_owner(request):
+    current_session = Session.objects.get(title=request.data['session_title'])
+    if request.user == current_session.owner:
+        data = {
+            'is_owner': True
+        }
+    else:
+        data = {
+            'is_owner': False
+        }
+
+    return Response(data)
+
+
 class SessionCreate(APIView):
     '''
     Fetch and create sessions
@@ -149,27 +174,3 @@ class SessionMemberList(generics.ListAPIView):
 @permission_classes((AllowAny, ))
 def test_deploy(request):
     return HttpResponse(content='You made it')
-
-
-# Utitlities
-def my_jwt_response_handler(token, user=None, request=None):
-    '''
-        Return response includes token, email, username
-    '''
-
-    return {
-        'token': token,
-        'user': UserSerializer(user, context={'request': request}).data
-    }
-
-
-def generate_new_token(user):
-    '''
-        Return token for authenticated user
-    '''
-    jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
-    jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
-
-    payload = jwt_payload_handler(user)
-    token = jwt_encode_handler(payload)
-    return token

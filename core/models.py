@@ -46,33 +46,6 @@ class Session(models.Model):
         return "session-%s" % self.id
 
 
-class RetroActionItems(TrackableDateModel):
-    '''
-    Store action items of Retro Board
-    '''
-
-    owner = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT
-    )
-    session = models.ForeignKey(
-        Session, on_delete=models.PROTECT
-    )
-    action_item_text = models.TextField(max_length=2000)
-
-
-class SessionMember(TrackableDateModel):
-    '''
-    Store all users from a session
-    '''
-
-    session = models.ForeignKey(
-        Session, on_delete=models.PROTECT
-    )
-    member = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.PROTECT
-    )
-
-
 class User(AbstractUser):
     username_validator = UsernameValidatorAllowSpace()
     username = models.CharField(
@@ -87,6 +60,41 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
+
+class SessionMember(TrackableDateModel):
+    '''
+    Store all users from a session
+    '''
+
+    session = models.ForeignKey(
+        Session, on_delete=models.CASCADE
+    )
+    member = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+    )
+
+
+class RetroBoardItems(TrackableDateModel):
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+    )
+    session = models.ForeignKey(
+        Session, on_delete=models.CASCADE
+    )
+    RETRO_BOARD_ITEMS_CHOICES = (
+        ('WWW', 'What Went Well'),
+        ('WDN', 'What Did Not'),
+        ('AI', 'Action Items')
+    )
+    item_type = models.CharField(
+        max_length=3,
+        choices=RETRO_BOARD_ITEMS_CHOICES,
+        default='AI'
+    )
+    item_text = models.TextField(
+        max_length=2000,
+    )
 
 
 class Story(models.Model):

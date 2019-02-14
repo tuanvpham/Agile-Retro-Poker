@@ -4,7 +4,6 @@ from .models import *
 
 
 class UserSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
         fields = ('username', 'email',)
@@ -83,6 +82,37 @@ class SessionSerializer(serializers.ModelSerializer):
             'owner_id',
             'owner_username',
             'owner_email'
+        )
+
+
+class RetroBoardItemsSerializer(serializers.ModelSerializer):
+    owner_username = serializers.SerializerMethodField()
+    session_title = serializers.SerializerMethodField()
+
+    def get_owner_username(self, obj):
+        try:
+            owner_obj = User.objects.get(id=obj.owner.id)
+            owner_username = owner_obj.username
+        except User.DoesNotExist:
+            owner_username = ''
+        return owner_username
+
+    def get_session_title(self, obj):
+        try:
+            session_obj = Session.objects.get(id=obj.session.id)
+            session_title = session_obj.title
+        except Session.DoesNotExist:
+            session_title = ''
+        return session_title
+
+    class Meta:
+        model = RetroBoardItems
+        fields = (
+            'id',
+            'owner_username',
+            'session_title',
+            'item_type',
+            'item_text'
         )
 
 
