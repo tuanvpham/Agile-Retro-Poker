@@ -25,6 +25,27 @@ class TrackableDateModel(models.Model):
         abstract = True
 
 
+class Session(models.Model):
+    title = models.CharField(max_length=30)
+    description = models.CharField(max_length=100, null=True, blank=True)
+    TYPES = (
+            ('R', 'Retro'),
+            ('P', 'Poker'),
+        )
+    session_type = models.CharField(max_length=10, choices=TYPES)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+    )
+
+    @property
+    def group_name(self):
+        '''
+        Returns the Channels Group name that sockets should subscribe to to get sent
+        messages as they are generated.
+        '''
+        return "session-%s" % self.id
+
+
 class User(AbstractUser):
     username_validator = UsernameValidatorAllowSpace()
     username = models.CharField(
@@ -39,22 +60,6 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
-
-
-class Session(models.Model):
-    title = models.CharField(max_length=30, unique=True)
-    description = models.CharField(max_length=100, null=True, blank=True)
-    owner = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True
-    )
-
-    @property
-    def group_name(self):
-        '''
-        Returns the Channels Group name that sockets should subscribe to to get sent
-        messages as they are generated.
-        '''
-        return "session-%s" % self.id
 
 
 class SessionMember(TrackableDateModel):
