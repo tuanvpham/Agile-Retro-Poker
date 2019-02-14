@@ -21,13 +21,7 @@ class QueryEmailAuthMiddlewareStack:
 
     def __call__(self, scope):
         email_query = scope['query_string'].decode()
-        print(email_query)
-
-        # print(type(scope['query_string'].decode()))
-        # Look up user from query string (you should also do things like
-        # check it's a valid user ID, or if scope["user"] is already populated)
-        # user = User.objects.get(email=email_query)
         user = get_object(email_query)
         close_old_connections()
-        # Return the inner application directly and let it run everything else
+
         return self.inner(dict(scope, user=user))
