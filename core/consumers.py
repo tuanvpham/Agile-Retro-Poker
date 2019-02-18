@@ -49,9 +49,6 @@ class SessionConsumer(WebsocketConsumer):
                 self.scope['url_route']['kwargs']['session_name']
             )
             owner = User.objects.get(id=session.owner_id)
-            session = get_session_object(
-                self.scope['url_route']['kwargs']['session_name']
-            )
 
             async_to_sync(self.channel_layer.group_send)(
                 self.room_group_name,
