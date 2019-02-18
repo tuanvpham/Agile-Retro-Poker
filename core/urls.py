@@ -15,5 +15,7 @@ urlpatterns = [
     path('retro-board-items/', views.RetroBoardItemsList.as_view()),
     path('session-owner/', views.check_session_owner),
     path('session-members/', views.SessionMemberList.as_view()),
-    path('deploy/', views.test_deploy)
+    path('deploy/', views.test_deploy),
+    path('end_retro/', views.end_retro),
+    path('oauth_user/', views.oauth_user),
 ]
