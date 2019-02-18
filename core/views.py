@@ -73,7 +73,7 @@ def end_retro(request):
     '''
 
     try:
-        items = list(RetroActionItems.objects.filter(session=request.data['session']))
+        items = list(RetroBoardItems.objects.filter(session=request.data['session']))
         jira_options = {
             'access_token': request.data['access_token'],
             'access_token_secret': request.data['secret_access_token'],
@@ -88,11 +88,10 @@ def end_retro(request):
         for i in items:
             jac.create_issue(
                 project='AG',
-                summary="Action Item " + session.title,
+                summary=i.item_text,
                 issuetype={'name':'Task'},
-                description=i.action_item_text
+                description="Access Item from Retro Session: " + session.title
             )
-            i.delete()
         session.delete()
         return Response(status=status.HTTP_200_OK)
     except:

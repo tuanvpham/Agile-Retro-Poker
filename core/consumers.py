@@ -62,7 +62,7 @@ class SessionConsumer(WebsocketConsumer):
                 }
             )
 
-            Session.objects.get(id=session.id).delete()
+            #Session.objects.get(id=session.id).delete()
         elif 'exit_session' in text_data_json:
             member = User.objects.get(username=text_data_json['session_member'])
             session = get_session_object(
