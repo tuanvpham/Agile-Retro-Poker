@@ -83,6 +83,35 @@ class SessionConsumer(WebsocketConsumer):
             )
 
             session_member.delete()
+        elif 'newItemText' in text_data_json:
+            item_type = text_data_json['itemType']
+            item_text = text_data_json['itemText']
+            new_item_text = text_data_json['newItemText']
+            item_id = text_data_json['item_id']
+            session = get_session_object(
+                self.scope['url_route']['kwargs']['session_name']
+            )
+            RetroBoardItems.objects.filter(
+                owner=self.scope['user'],
+                session=session,
+                item_type=item_type,
+                item_text=item_text,
+                id=item_id
+            ).update(item_text=new_item_text)
+        elif 'delete' in text_data_json:
+            item_type = text_data_json['itemType']
+            item_text = text_data_json['itemText']
+            item_id = text_data_json['item_id']
+            session = get_session_object(
+                self.scope['url_route']['kwargs']['session_name']
+            )
+            RetroBoardItems.objects.filter(
+                owner=self.scope['user'],
+                session=session,
+                item_type=item_type,
+                item_text=item_text,
+                id=item_id      
+            ).delete()      
         else:
             item_type = text_data_json['itemType']
             item_text = text_data_json['itemText']

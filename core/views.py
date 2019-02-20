@@ -50,12 +50,13 @@ def oauth_user(request):
             options={'server':JIRA_SERVER}, 
             oauth=jira_options
         )
+        jac_username = jac.myself().get('displayName')
         access_tokens = {
             'access_token': jira_options['access_token'],
             'secret_access_token': jira_options['access_token_secret']
         }
-        response_data = {**response_data, **access_tokens}
-        #json_response = json.dumps(response_data)
+        user_data = {'username': jac_username}
+        response_data = {**response_data, **access_tokens, **user_data}
         return Response(data=response_data, status=status.HTTP_200_OK)
         #return TemplateResponse(request=request, template='index.html')
     except:
@@ -73,7 +74,7 @@ def end_retro(request):
     '''
 
     try:
-        items = list(RetroBoardItems.objects.filter(session=request.data['session']))
+        items = list(RetroBoardItems.objects.filter(item_type='AI', session=request.data['session']))
         jira_options = {
             'access_token': request.data['access_token'],
             'access_token_secret': request.data['secret_access_token'],
@@ -121,8 +122,7 @@ class UserAuthentication(APIView):
         try:
             access_tokens = connect_1()
             user = self.get_object(email)
-            jac_username = 'Kyle Capehart'
-            #jac_username = jac.myself().get('displayName')
+            jac_username = ''
             user = self.get_object(email)
             if user is None:
                 # Signup with ACC
