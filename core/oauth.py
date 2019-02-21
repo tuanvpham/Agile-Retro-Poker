@@ -39,10 +39,10 @@ def connect_1():
                 request_token['oauth_token'] +
                 "&oauth_callback=http://localhost:3000/oauth_user" +
                 "?oauth_token_secret=" + resource_owner_secret)
-    webbrowser.open(redir_url)
     access_tokens = {
         'oauth_token': resource_owner_key,
-        'oauth_token_secret': resource_owner_secret
+        'oauth_token_secret': resource_owner_secret,
+        'oauth_url': redir_url
     }
     return access_tokens
 
