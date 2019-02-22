@@ -9,7 +9,14 @@ from rest_framework.viewsets import ViewSet
 from .models import *
 from .serializers import *
 from .utilities import *
+from .oauth import *
 
+
+JIRA_SERVER = 'https://agilecommandcentralgroup10.atlassian.net'
+CONSUMER_KEY = 'OauthKey'
+CONSUMER_SECRET = 'dont_care'
+VERIFIER = 'jira_verifier'
+RSA_KEY = read('jira_privatekey.pem')
 
 
 # Rest API View
@@ -21,6 +28,75 @@ def current_user(request):
 
     serializer = UserSerializer(request.user)
     return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes((AllowAny, ))
+def oauth_user(request):
+    response_data = {
+        'message': "Success"
+    }
+    status_code = status.HTTP_400_BAD_REQUEST
+    try:
+        try:
+            oauth_token = request.data['oauth_token']
+            oauth_token_secret = request.data['oauth_token_secret']
+        except:
+            oauth_token = request.query_params['oauth_token']
+            oauth_token_secret = request.query_params['oauth_token_secret']
+        
+        jira_options = connect_2(oauth_token, oauth_token_secret)
+        jac = JIRA(
+            options={'server':JIRA_SERVER}, 
+            oauth=jira_options
+        )
+        jac_username = jac.myself().get('displayName')
+        access_tokens = {
+            'access_token': jira_options['access_token'],
+            'secret_access_token': jira_options['access_token_secret']
+        }
+        user_data = {'username': jac_username}
+        response_data = {**response_data, **access_tokens, **user_data}
+        return Response(data=response_data, status=status.HTTP_200_OK)
+        #return TemplateResponse(request=request, template='index.html')
+    except:
+        response_data = {
+            'message': "Error"
+        }
+        return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes((AllowAny, ))
+def end_retro(request):
+    '''
+    When a retro session ends, post all action items to Jira
+    '''
+
+    try:
+        items = list(RetroBoardItems.objects.filter(item_type='AI', session=request.data['session']))
+        jira_options = {
+            'access_token': request.data['access_token'],
+            'access_token_secret': request.data['secret_access_token'],
+            'consumer_key': CONSUMER_KEY,
+            'key_cert': RSA_KEY
+        }
+        jac = JIRA(
+            options={'server': JIRA_SERVER},
+            oauth=jira_options
+        )
+        session = Session.objects.get(id=request.data['session'])
+        for i in items:
+            jac.create_issue(
+                project='AG',
+                summary=i.item_text,
+                issuetype={'name':'Task'},
+                description="Access Item from Retro Session: " + session.title
+            )
+        session.delete()
+        return Response(status=status.HTTP_200_OK)
+    except:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserAuthentication(APIView):
@@ -44,13 +120,9 @@ class UserAuthentication(APIView):
         })
         status_code = status.HTTP_400_BAD_REQUEST
         try:
-            # Login with Jira Auth
-            jac = JIRA(
-                'https://agilecommandcentralgroup10.atlassian.net',
-                basic_auth=(email, password),
-                max_retries=1, timeout=5
-            )
-            jac_username = jac.myself().get('displayName')
+            access_tokens = connect_1()
+            user = self.get_object(email)
+            jac_username = ''
             user = self.get_object(email)
             if user is None:
                 # Signup with ACC
@@ -66,7 +138,7 @@ class UserAuthentication(APIView):
                     response_data = ({
                         'message': "Successfully logged in user for the first time"
                     })
-                    response_data = {**response_data, **serializer.data}
+                    response_data = {**response_data, **serializer.data, **access_tokens}
                     status_code = status.HTTP_201_CREATED
                 # otherwise get the errors
                 else:
@@ -86,7 +158,7 @@ class UserAuthentication(APIView):
                 response_data = ({
                     'message': "Successfully logged in",
                 })
-                response_data = {**response_data, **user_data}
+                response_data = {**response_data, **user_data, **access_tokens}
                 status_code = status.HTTP_200_OK
         except JIRAError as e:
             if e.status_code == 401:
