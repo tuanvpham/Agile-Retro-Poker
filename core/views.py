@@ -71,7 +71,6 @@ def oauth_user(request):
         }
 
         user = get_user_object(jac_email)
-        print(user)
         if user is None:
             # Signup with ACC
             # convert the user data to a byte stream
