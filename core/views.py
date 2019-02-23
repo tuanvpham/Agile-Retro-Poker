@@ -70,9 +70,6 @@ def oauth_user(request):
             'secret_access_token': jira_options['access_token_secret']
         }
 
-        print('jac_username: ' + str(jac_username))
-        print('jac_email: ' + jac_email)
-
         user = get_user_object(jac_email)
         print(user)
         if user is None:
@@ -84,7 +81,6 @@ def oauth_user(request):
             })
             # if it is possible to deserialize the data then success
             if serializer.is_valid():
-                print(serializer)
                 serializer.save()
                 response_data = ({
                     'message': "Successfully logged in user for the first time"
@@ -101,8 +97,6 @@ def oauth_user(request):
                 status_code = status.HTTP_400_BAD_REQUEST
         else:
             # generate a token for the session if the credentials were valid
-
-            print(user)
             token = generate_new_token(user)
             user_data = ({
                 'token': token,
