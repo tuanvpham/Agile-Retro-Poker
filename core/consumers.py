@@ -5,7 +5,7 @@ from .utilities import *
 import json
 
 
-class SessionConsumer(WebsocketConsumer):
+class RetroConsumer(WebsocketConsumer):
     def connect(self):
         print('CONNECT')
         session = get_session_object(
@@ -107,8 +107,8 @@ class SessionConsumer(WebsocketConsumer):
                 session=session,
                 item_type=item_type,
                 item_text=item_text,
-                id=item_id      
-            ).delete()      
+                id=item_id
+            ).delete()
         else:
             item_type = text_data_json['itemType']
             item_text = text_data_json['itemText']
@@ -182,3 +182,44 @@ class SessionConsumer(WebsocketConsumer):
             'member': member,
             'exit_session_message': exit_session_message
         }))
+
+
+class PokerConsumer(WebsocketConsumer):
+    def connect(self):
+        # print('CONNECT')
+        # session = get_session_object(
+        #     self.scope['url_route']['kwargs']['session_name']
+        # )
+        # user = get_session_member_object(self.scope['user'])
+        # if session and self.scope['user'] is not None:
+        #     self.room_name = session.title
+        #     self.room_group_name = 'session_%s' % self.room_name
+
+        #     if user is None:
+        #         new_member = SessionMember.objects.create(
+        #             session=session, member=self.scope['user']
+        #         )
+        #         new_member.save()
+
+        #     # Join session
+        #     async_to_sync(self.channel_layer.group_add)(
+        #         self.room_group_name,
+        #         self.channel_name
+        #     )
+
+        #     self.accept()
+        # else:
+        #     print('DISCONNECT - MISSING SESSION')
+        #     self.close()
+        print(self.scope['url_route']['kwargs']['session_name'])
+
+    def disconnect(self, close_code):
+        # Leave session
+        print('DISCONNECT - WEBSOCKET CLOSED')
+        async_to_sync(self.channel_layer.group_discard)(
+            self.room_group_name,
+            self.channel_name
+        )
+
+    def receive(self, text_data):
+        return text_data
