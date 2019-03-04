@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from .models import *
@@ -11,12 +12,19 @@ class RetroConsumer(WebsocketConsumer):
         session = get_session_object(
             self.scope['url_route']['kwargs']['session_name']
         )
-        user = get_session_member_object(self.scope['user'])
-        if session and self.scope['user'] is not None:
+        try:
+            member = SessionMember.objects.get(
+                session=session,
+                member=self.scope['user']
+            )
+        except SessionMember.DoesNotExist:
+            member = None
+
+        if session is not None:
             self.room_name = session.title
             self.room_group_name = 'session_%s' % self.room_name
 
-            if user is None:
+            if member is None:
                 new_member = SessionMember.objects.create(
                     session=session, member=self.scope['user']
                 )
@@ -27,10 +35,9 @@ class RetroConsumer(WebsocketConsumer):
                 self.room_group_name,
                 self.channel_name
             )
-
             self.accept()
         else:
-            print('DISCONNECT - MISSING SESSION')
+            # print('DISCONNECT - MISSING SESSION')
             self.close()
 
     def disconnect(self, close_code):
@@ -186,32 +193,37 @@ class RetroConsumer(WebsocketConsumer):
 
 class PokerConsumer(WebsocketConsumer):
     def connect(self):
-        # print('CONNECT')
-        # session = get_session_object(
-        #     self.scope['url_route']['kwargs']['session_name']
-        # )
-        # user = get_session_member_object(self.scope['user'])
-        # if session and self.scope['user'] is not None:
-        #     self.room_name = session.title
-        #     self.room_group_name = 'session_%s' % self.room_name
+        print('CONNECT')
+        session = get_session_object(
+            self.scope['url_route']['kwargs']['session_name']
+        )
+        try:
+            member = SessionMember.objects.get(
+                session=session,
+                member=self.scope['user']
+            )
+        except SessionMember.DoesNotExist:
+            member = None
 
-        #     if user is None:
-        #         new_member = SessionMember.objects.create(
-        #             session=session, member=self.scope['user']
-        #         )
-        #         new_member.save()
+        if session is not None:
+            self.room_name = session.title
+            self.room_group_name = 'session_%s' % self.room_name
 
-        #     # Join session
-        #     async_to_sync(self.channel_layer.group_add)(
-        #         self.room_group_name,
-        #         self.channel_name
-        #     )
+            if member is None:
+                new_member = SessionMember.objects.create(
+                    session=session, member=self.scope['user']
+                )
+                new_member.save()
 
-        #     self.accept()
-        # else:
-        #     print('DISCONNECT - MISSING SESSION')
-        #     self.close()
-        print(self.scope['url_route']['kwargs']['session_name'])
+            # Join session
+            async_to_sync(self.channel_layer.group_add)(
+                self.room_group_name,
+                self.channel_name
+            )
+            self.accept()
+        else:
+            print('DISCONNECT - MISSING SESSION')
+            self.close()
 
     def disconnect(self, close_code):
         # Leave session
@@ -222,4 +234,111 @@ class PokerConsumer(WebsocketConsumer):
         )
 
     def receive(self, text_data):
-        return text_data
+        text_data_json = json.loads(text_data)
+        print(text_data_json)
+
+        if 'next_story' in text_data_json:
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'toggle_next_story',
+                    'toggle_next_story': text_data_json['next_story']
+                }
+            )
+        elif 'prev_story' in text_data_json:
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'toggle_prev_story',
+                    'toggle_prev_story': text_data_json['prev_story']
+                }
+            )
+        elif 'play_card' in text_data_json:
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'play_card',
+                    'play_card': text_data_json['play_card'],
+                    'user': self.scope['user'].username,
+                    'story': text_data_json['story']
+                }
+            )
+        elif 'flip_card' in text_data_json:
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'flip_card',
+                    'flip_card': text_data_json['flip_card'],
+                    'user': self.scope['user'].username,
+                }
+            )
+        else:
+            card_owner = text_data_json['card_owner']
+            card = text_data_json['card']
+            story = text_data_json['story']
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'users_show_card',
+                    'card_owner': card_owner,
+                    'card': card,
+                    'story': story
+                }
+            )
+
+    def toggle_next_story(self, event):
+        toggle_next_story = event['toggle_next_story']
+        self.send(text_data=json.dumps({
+            'toggle_next_story': toggle_next_story
+        }))
+
+    def toggle_prev_story(self, event):
+        toggle_prev_story = event['toggle_prev_story']
+        self.send(text_data=json.dumps({
+            'toggle_prev_story': toggle_prev_story
+        }))
+
+    def play_card(self, event):
+        play_card = event['play_card']
+        user = event['user']
+        story = event['story']
+        self.send(text_data=json.dumps({
+            'play_card': play_card,
+            'user': user,
+            'story': story
+        }))
+
+    def flip_card(self, event):
+        flip_card = event['flip_card']
+        user = event['user']
+        self.send(text_data=json.dumps({
+            'flip_card': flip_card,
+            'user': user
+        }))
+
+    def users_show_card(self, event):
+        card_owner = event['card_owner']
+        card = event['card']
+        story = event['story']
+        self.send(text_data=json.dumps({
+            'card_owner': card_owner,
+            'card': card,
+            'story': story
+        }))
+
+    #     async_to_sync(self.channel_layer.group_send)(
+    #         self.room_group_name,
+    #         {
+    #             'type': 'submit_story_points',
+    #             'card_owner': self.scope['user'].username,
+    #             'card': text_data_json
+    #         }
+    #     )
+
+    # def submit_story_points(self, event):
+    #     card_owner = event['card_owner']
+    #     card = event['card']
+    #     self.send(text_data=json.dumps({
+    #         'card_owner': card_owner,
+    #         'card': card
+    #     }))

@@ -176,9 +176,15 @@ def check_session_owner(request):
     return Response(data)
 
 
-class SessionMemberList(generics.ListAPIView):
-    queryset = SessionMember.objects.all()
-    serializer_class = SessionMemberSerializer
+class SessionMemberList(APIView):
+    '''
+        Retrieve all members of a specific session
+    '''
+
+    def get(self, request, session_id, format=None):
+        member_list = SessionMember.objects.filter(session_id=session_id)
+        serializer = SessionMemberSerializer(member_list, many=True)
+        return Response(serializer.data)
 
 
 @api_view(['POST'])
@@ -211,3 +217,15 @@ def end_retro(request):
         return Response(status=status.HTTP_200_OK)
     except:
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+# Planning Poker
+class Stories(APIView):
+    '''
+        Retrieve a specific story
+    '''
+
+    def get(self, request, session_id, format=None):
+        story_list = Story.objects.filter(session_id=session_id)
+        serializer = StorySerializer(story_list, many=True)
+        return Response(serializer.data)
