@@ -235,8 +235,6 @@ class PokerConsumer(WebsocketConsumer):
 
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        print(text_data_json)
-
         if 'next_story' in text_data_json:
             async_to_sync(self.channel_layer.group_send)(
                 self.room_group_name,
@@ -254,13 +252,40 @@ class PokerConsumer(WebsocketConsumer):
                 }
             )
         elif 'play_card' in text_data_json:
+            session = get_session_object(
+                self.scope['url_route']['kwargs']['session_name']
+            )
+            story = get_story_object(text_data_json['story'])
+            player = get_user_object(text_data_json['player'])
+
+            try:
+                lookUpCard = Card.objects.get(
+                    session=session,
+                    owner=self.scope['user'],
+                    story=story
+                )
+            except Card.DoesNotExist:
+                lookUpCard = None
+
+            if lookUpCard is None:
+                card = Card.objects.create(
+                    card=text_data_json['card'],
+                    session=session,
+                    owner=self.scope['user'],
+                    story=story
+                )
+                card.save()
+            else:
+                lookUpCard.card = text_data_json['card']
+                lookUpCard.save()
+
             async_to_sync(self.channel_layer.group_send)(
                 self.room_group_name,
                 {
                     'type': 'play_card',
                     'play_card': text_data_json['play_card'],
-                    'user': self.scope['user'].username,
-                    'story': text_data_json['story']
+                    'card': text_data_json['card'],
+                    'player': player.username
                 }
             )
         elif 'flip_card' in text_data_json:
@@ -269,7 +294,6 @@ class PokerConsumer(WebsocketConsumer):
                 {
                     'type': 'flip_card',
                     'flip_card': text_data_json['flip_card'],
-                    'user': self.scope['user'].username,
                 }
             )
         else:
@@ -282,7 +306,6 @@ class PokerConsumer(WebsocketConsumer):
                     'type': 'users_show_card',
                     'card_owner': card_owner,
                     'card': card,
-                    'story': story
                 }
             )
 
@@ -300,45 +323,16 @@ class PokerConsumer(WebsocketConsumer):
 
     def play_card(self, event):
         play_card = event['play_card']
-        user = event['user']
-        story = event['story']
+        card = event['card']
+        player = event['player']
         self.send(text_data=json.dumps({
             'play_card': play_card,
-            'user': user,
-            'story': story
+            'player': player,
+            'card': card
         }))
 
     def flip_card(self, event):
         flip_card = event['flip_card']
-        user = event['user']
         self.send(text_data=json.dumps({
             'flip_card': flip_card,
-            'user': user
         }))
-
-    def users_show_card(self, event):
-        card_owner = event['card_owner']
-        card = event['card']
-        story = event['story']
-        self.send(text_data=json.dumps({
-            'card_owner': card_owner,
-            'card': card,
-            'story': story
-        }))
-
-    #     async_to_sync(self.channel_layer.group_send)(
-    #         self.room_group_name,
-    #         {
-    #             'type': 'submit_story_points',
-    #             'card_owner': self.scope['user'].username,
-    #             'card': text_data_json
-    #         }
-    #     )
-
-    # def submit_story_points(self, event):
-    #     card_owner = event['card_owner']
-    #     card = event['card']
-    #     self.send(text_data=json.dumps({
-    #         'card_owner': card_owner,
-    #         'card': card
-    #     }))
