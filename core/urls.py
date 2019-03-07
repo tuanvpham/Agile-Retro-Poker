@@ -18,4 +18,5 @@ urlpatterns = [
     path('session-members/<int:session_id>/', views.SessionMemberList.as_view()),
     path('end_retro/', views.end_retro),
     path('stories/<int:session_id>/', views.Stories.as_view()),
+    path('cards/<int:session_id>/<int:story_id>/', views.Cards.as_view())
 ]

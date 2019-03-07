@@ -229,3 +229,17 @@ class Stories(APIView):
         story_list = Story.objects.filter(session_id=session_id)
         serializer = StorySerializer(story_list, many=True)
         return Response(serializer.data)
+
+
+class Cards(APIView):
+    '''
+        Retrive cards for a specif story and session
+    '''
+
+    def get(self, request, session_id, story_id, format=None):
+        card_list = Card.objects.filter(
+            session_id=session_id,
+            story_id=story_id
+        )
+        serializer = CardSerializer(card_list, many=True)
+        return Response(serializer.data)
