@@ -103,8 +103,17 @@ class RetroBoardItems(TrackableDateModel):
 class Story(models.Model):
     title = models.CharField(max_length=50)
     description = models.CharField(max_length=100, null=True, blank=True)
-    story_points = models.IntegerField(default=-1, null=True, blank=True)
+    story_points = models.IntegerField(null=True, blank=True)
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title
+
+
+class Card(models.Model):
+    card = models.IntegerField()
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+    )
+    session = models.ForeignKey(Session, on_delete=models.CASCADE)
+    story = models.ForeignKey(Story, on_delete=models.CASCADE)
