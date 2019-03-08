@@ -85,6 +85,7 @@ class SessionConsumer(WebsocketConsumer):
             item_text = text_data_json['itemText']
             new_item_text = text_data_json['newItemText']
             item_id = text_data_json['item_id']
+            item_index = text_data_json['index']
             session = get_session_object(
                 self.scope['url_route']['kwargs']['session_name']
             )
@@ -95,6 +96,17 @@ class SessionConsumer(WebsocketConsumer):
                 item_text=item_text,
                 id=item_id
             ).update(item_text=new_item_text)
+
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'send_out_new_item_text',
+                    'item_id': item_id,
+                    'item_type': item_type,
+                    'new_item_text': new_item_text,
+                    'item_index': item_index
+                }
+            )   
         elif 'delete' in text_data_json:
             item_type = text_data_json['itemType']
             item_text = text_data_json['itemText']
@@ -108,7 +120,16 @@ class SessionConsumer(WebsocketConsumer):
                 item_type=item_type,
                 item_text=item_text,
                 id=item_id      
-            ).delete()      
+            ).delete()   
+            
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'delete_item_from_front_end',
+                    'item_id': item_id,
+                    'item_type': item_type
+                }
+            )   
         else:
             item_type = text_data_json['itemType']
             item_text = text_data_json['itemText']
@@ -154,6 +175,31 @@ class SessionConsumer(WebsocketConsumer):
                 }
             )
 
+
+    def send_out_new_item_text(self, event):
+        item_id = event['item_id']
+        item_type = event['item_type']
+        new_item_text = event['new_item_text']
+        item_index = event['item_index']
+
+        self.send(text_data=json.dumps({
+            'id': item_id,
+            'item_type': item_type,
+            'new_item_text': new_item_text,
+            'edit_item_message': 'edit_item',
+            'item_index': item_index
+        }))
+
+    def delete_item_from_front_end(self, event):
+        item_id = event['item_id']
+        item_type = event['item_type']
+
+        self.send(text_data=json.dumps({
+            'id': item_id,
+            'item_type': item_type,
+            'delete_item_message': 'delete_item'
+        }))
+
     def send_out_retro_board_item_to_websocket(self, event):
         item_id = event['item_id']
         item_owner = event['item_owner']
@@ -161,7 +207,7 @@ class SessionConsumer(WebsocketConsumer):
         item_text = event['item_text']
 
         self.send(text_data=json.dumps({
-            'item_id': item_id,
+            'id': item_id,
             'item_owner': item_owner,
             'item_type': item_type,
             'item_text':  item_text

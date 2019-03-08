@@ -28,7 +28,7 @@ class Login(APIView):
 
     def get(self, request, format=None):
         response_data = ({
-            'message': "Unknown error"
+            'message': "Successful"
         })
         status_code = status.HTTP_400_BAD_REQUEST
         try:
@@ -161,6 +161,49 @@ class RetroBoardItemsList(generics.ListAPIView):
     serializer_class = RetroBoardItemsSerializer
 
 
+class StoryItemList(generics.ListAPIView):
+    '''
+    Returns all story items
+    '''
+
+    queryset = Story.objects.all()
+    serializer_class = StorySerializer
+
+
+class StorySelectList(APIView):
+    '''
+    Returns all stories from Jira backlog for Planning Poker and updates them when done
+    '''
+
+    def post(self, request, format=None):
+        try:
+            jira_options = {
+                'access_token': request.data['access_token'],
+                'access_token_secret': request.data['secret_access_token'],
+                'consumer_key': CONSUMER_KEY,
+                'key_cert': RSA_KEY
+            }
+            jac = JIRA(
+                options={'server': JIRA_SERVER},
+                oauth=jira_options
+            )
+            stories = jac.search_issues('issueType=Story')
+            for story in stories:
+                story_serializer = StorySerializer(data={
+                    'session': request.data['session'],
+                    'title': story.fields.id,  # We need to add a field to the table that is Jira ID
+                    'description': story.feilds.description,
+                    'story_points': story.fields.customfield_10024,
+                    'key': story.key}
+                )
+                if(story_serializer.is_valid):
+                    story_serializer.save()
+        except:
+            return Response(story_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(story_serializer.data, status=status.HTTP_200_OK)
+
+
+
 @api_view(['POST'])
 def check_session_owner(request):
     current_session = Session.objects.get(title=request.data['session_title'])
@@ -174,6 +217,14 @@ def check_session_owner(request):
         }
 
     return Response(data)
+
+
+@api_view(['POST'])
+def update_points(request):
+    story = Story.objects.get(id=request.data['id'])
+    story.story_points = request.data['points']
+    story.save(update_fields=["story_points"])
+    return Response(status=status.HTTP_200_OK)
 
 
 class SessionMemberList(generics.ListAPIView):
@@ -207,6 +258,37 @@ def end_retro(request):
                 issuetype={'name':'Task'},
                 description="Access Item from Retro Session: " + session.title
             )
+        session.delete()
+        return Response(status=status.HTTP_200_OK)
+    except:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def end_poker(request):
+    '''
+    Update all stories in the database in Jira when Planning Poker session ends
+    '''
+
+    try:
+        jira_options = {
+            'access_token': request.data['access_token'],
+            'access_token_secret': request.data['secret_access_token'],
+            'consumer_key': CONSUMER_KEY,
+            'key_cert': RSA_KEY
+        }
+        jac = JIRA(
+            options={'server': JIRA_SERVER},
+            oauth=jira_options
+        )
+        new_stories = Story.objects.get(session=request.data['session'])
+        old_stories = jac.search_issues('issueType=Story')
+        for ns in new_stories:
+            for os in old_stories:
+                if(ns.key == os.key):
+                    os.update(fields={'customfield_10024': ns.story_points})
+                    break
+        session = Session.objects.get(id=request.data['session'])
         session.delete()
         return Response(status=status.HTTP_200_OK)
     except:
