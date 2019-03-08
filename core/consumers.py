@@ -296,18 +296,46 @@ class PokerConsumer(WebsocketConsumer):
                     'flip_card': text_data_json['flip_card'],
                 }
             )
-        else:
-            card_owner = text_data_json['card_owner']
-            card = text_data_json['card']
-            story = text_data_json['story']
+        elif 'submit_points' in text_data_json:
             async_to_sync(self.channel_layer.group_send)(
                 self.room_group_name,
                 {
-                    'type': 'users_show_card',
-                    'card_owner': card_owner,
-                    'card': card,
+                    'type': 'submit_new_story_points',
+                    'submit_points': text_data_json['submit_points'],
+                    'points': text_data_json['points'],
+                    'story': text_data_json['story']
                 }
             )
+        elif 'reset_cards' in text_data_json:
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'reset_cards',
+                    'reset_cards': text_data_json['reset_cards'],
+                    'story': text_data_json['story']
+                }
+            )
+        elif 'end_game' in text_data_json:
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'end_game',
+                    'end_game': text_data_json['end_game'],
+                    'story': text_data_json['story']
+                }
+            )
+        # else:
+        #     card_owner = text_data_json['card_owner']
+        #     card = text_data_json['card']
+        #     story = text_data_json['story']
+        #     async_to_sync(self.channel_layer.group_send)(
+        #         self.room_group_name,
+        #         {
+        #             'type': 'users_show_card',
+        #             'card_owner': card_owner,
+        #             'card': card,
+        #         }
+        #     )
 
     def toggle_next_story(self, event):
         toggle_next_story = event['toggle_next_story']
@@ -335,4 +363,30 @@ class PokerConsumer(WebsocketConsumer):
         flip_card = event['flip_card']
         self.send(text_data=json.dumps({
             'flip_card': flip_card,
+        }))
+
+    def submit_new_story_points(self, event):
+        submit_points = event['submit_points']
+        points = event['points']
+        story = event['story']
+        self.send(text_data=json.dumps({
+            'submit_points': submit_points,
+            'points': points,
+            'story': story
+        }))
+
+    def reset_cards(self, event):
+        reset_cards = event['reset_cards']
+        story = event['story']
+        self.send(text_data=json.dumps({
+            'reset_cards': reset_cards,
+            'story': story
+        }))
+
+    def end_game(self, event):
+        end_game = event['end_game']
+        story = event['story']
+        self.send(text_data=json.dumps({
+            'end_game': end_game,
+            'story': story
         }))
