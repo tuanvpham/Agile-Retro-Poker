@@ -103,7 +103,7 @@ class SessionConsumer(WebsocketConsumer):
                     'type': 'send_out_new_item_text',
                     'item_id': item_id,
                     'item_type': item_type,
-                    'item_text': item_text,
+                    'new_item_text': new_item_text,
                     'item_index': item_index
                 }
             )   
@@ -179,13 +179,13 @@ class SessionConsumer(WebsocketConsumer):
     def send_out_new_item_text(self, event):
         item_id = event['item_id']
         item_type = event['item_type']
-        item_text = event['item_text']
+        new_item_text = event['new_item_text']
         item_index = event['item_index']
 
         self.send(text_data=json.dumps({
             'id': item_id,
             'item_type': item_type,
-            'item_text': item_text,
+            'new_item_text': new_item_text,
             'edit_item_message': 'edit_item',
             'item_index': item_index
         }))
