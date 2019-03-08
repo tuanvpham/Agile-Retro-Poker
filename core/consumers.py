@@ -85,6 +85,7 @@ class SessionConsumer(WebsocketConsumer):
             item_text = text_data_json['itemText']
             new_item_text = text_data_json['newItemText']
             item_id = text_data_json['item_id']
+            item_index = text_data_json['index']
             session = get_session_object(
                 self.scope['url_route']['kwargs']['session_name']
             )
@@ -102,7 +103,8 @@ class SessionConsumer(WebsocketConsumer):
                     'type': 'send_out_new_item_text',
                     'item_id': item_id,
                     'item_type': item_type,
-                    'item_text': item_text
+                    'item_text': item_text,
+                    'item_index': item_index
                 }
             )   
         elif 'delete' in text_data_json:
@@ -178,12 +180,14 @@ class SessionConsumer(WebsocketConsumer):
         item_id = event['item_id']
         item_type = event['item_type']
         item_text = event['item_text']
+        item_index = event['item_index']
 
         self.send(text_data=json.dumps({
             'id': item_id,
             'item_type': item_type,
             'item_text': item_text,
-            'edit_item_message': 'edit_item'
+            'edit_item_message': 'edit_item',
+            'item_index': item_index
         }))
 
     def delete_item_from_front_end(self, event):
