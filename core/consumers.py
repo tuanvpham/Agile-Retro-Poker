@@ -324,18 +324,6 @@ class PokerConsumer(WebsocketConsumer):
                     'story': text_data_json['story']
                 }
             )
-        # else:
-        #     card_owner = text_data_json['card_owner']
-        #     card = text_data_json['card']
-        #     story = text_data_json['story']
-        #     async_to_sync(self.channel_layer.group_send)(
-        #         self.room_group_name,
-        #         {
-        #             'type': 'users_show_card',
-        #             'card_owner': card_owner,
-        #             'card': card,
-        #         }
-        #     )
 
     def toggle_next_story(self, event):
         toggle_next_story = event['toggle_next_story']
