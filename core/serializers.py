@@ -156,7 +156,8 @@ class StorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Story
-        fields = ('id', 'title', 'description', 'story_points', 'session')
+        fields = ('id', 'title', 'description',
+                  'story_points', 'session', 'key')
 
 
 class CardSerializer(serializers.ModelSerializer):
@@ -188,9 +189,6 @@ class CardSerializer(serializers.ModelSerializer):
     class Meta:
         model = Card
         fields = (
-            'id',
-            'card',
-            'player',
-            'session',
-            'story'
+            'id', 'card', 'player',
+            'session', 'story'
         )

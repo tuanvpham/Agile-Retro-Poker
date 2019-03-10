@@ -105,6 +105,7 @@ class Story(models.Model):
     description = models.CharField(max_length=100, null=True, blank=True)
     story_points = models.IntegerField(null=True, blank=True)
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
+    key = models.CharField(max_length=10, null=True)
 
     def __str__(self):
         return self.title
