@@ -156,4 +156,39 @@ class StorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Story
-        fields = ('id', 'title', 'description', 'story_points', 'session', 'key')
+        fields = ('id', 'title', 'description',
+                  'story_points', 'session', 'key')
+
+
+class CardSerializer(serializers.ModelSerializer):
+    player = serializers.SerializerMethodField()
+    session = serializers.SerializerMethodField()
+    story = serializers.SerializerMethodField()
+
+    def get_player(self, obj):
+        try:
+            player = User.objects.get(id=obj.owner_id).username
+        except User.DoesNotExist:
+            player = ''
+        return player
+
+    def get_session(self, obj):
+        try:
+            session = Session.objects.get(id=obj.session_id).title
+        except:
+            session = ''
+        return session
+
+    def get_story(self, obj):
+        try:
+            story = Story.objects.get(id=obj.story_id).title
+        except:
+            story = ''
+        return story
+
+    class Meta:
+        model = Card
+        fields = (
+            'id', 'card', 'player',
+            'session', 'story'
+        )

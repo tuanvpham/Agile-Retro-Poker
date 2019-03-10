@@ -17,6 +17,13 @@ def get_session_object(title):
             return None
 
 
+def get_story_object(id):
+    try:
+        return Story.objects.get(id=id)
+    except Story.DoesNotExist:
+        return None
+
+
 def get_session_member_object(user):
     try:
         return SessionMember.objects.get(member=user)

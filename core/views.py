@@ -191,7 +191,7 @@ class StorySelectList(APIView):
             for story in stories:
                 story_serializer = StorySerializer(data={
                     'session': request.data['session'],
-                    'title': story.fields.id,  # We need to add a field to the table that is Jira ID
+                    'title': story.fields.id,
                     'description': story.feilds.description,
                     'story_points': story.fields.customfield_10024,
                     'key': story.key}
@@ -199,9 +199,11 @@ class StorySelectList(APIView):
                 if(story_serializer.is_valid):
                     story_serializer.save()
         except:
-            return Response(story_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                story_serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
         return Response(story_serializer.data, status=status.HTTP_200_OK)
-
 
 
 @api_view(['POST'])
@@ -219,17 +221,23 @@ def check_session_owner(request):
     return Response(data)
 
 
+class SessionMemberList(APIView):
+    '''
+        Retrieve all members of a specific session
+    '''
+
+    def get(self, request, session_id, format=None):
+        member_list = SessionMember.objects.filter(session_id=session_id)
+        serializer = SessionMemberSerializer(member_list, many=True)
+        return Response(serializer.data)
+
+
 @api_view(['POST'])
 def update_points(request):
     story = Story.objects.get(id=request.data['id'])
     story.story_points = request.data['points']
     story.save(update_fields=["story_points"])
     return Response(status=status.HTTP_200_OK)
-
-
-class SessionMemberList(generics.ListAPIView):
-    queryset = SessionMember.objects.all()
-    serializer_class = SessionMemberSerializer
 
 
 @api_view(['POST'])
@@ -239,7 +247,11 @@ def end_retro(request):
     '''
 
     try:
-        items = list(RetroBoardItems.objects.filter(item_type='AI', session=request.data['session']))
+        items = list(
+            RetroBoardItems.objects.filter(
+                item_type='AI', session=request.data['session']
+            )
+        )
         jira_options = {
             'access_token': request.data['access_token'],
             'access_token_secret': request.data['secret_access_token'],
@@ -255,13 +267,38 @@ def end_retro(request):
             jac.create_issue(
                 project='AG',
                 summary=i.item_text,
-                issuetype={'name':'Task'},
+                issuetype={'name': 'Task'},
                 description="Access Item from Retro Session: " + session.title
             )
         session.delete()
         return Response(status=status.HTTP_200_OK)
     except:
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class Stories(APIView):
+    '''
+        Retrieve a specific story
+    '''
+
+    def get(self, request, session_id, format=None):
+        story_list = Story.objects.filter(session_id=session_id)
+        serializer = StorySerializer(story_list, many=True)
+        return Response(serializer.data)
+
+
+class Cards(APIView):
+    '''
+        Retrive cards for a specif story and session
+    '''
+
+    def get(self, request, session_id, story_id, format=None):
+        card_list = Card.objects.filter(
+            session_id=session_id,
+            story_id=story_id
+        )
+        serializer = CardSerializer(card_list, many=True)
+        return Response(serializer.data)
 
 
 @api_view(['POST'])

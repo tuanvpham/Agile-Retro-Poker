@@ -45,6 +45,9 @@ class Session(models.Model):
         '''
         return "session-%s" % self.id
 
+    def __str__(self):
+        return 'session title: ' + str(self.title) + ' - types: ' + str(self.session_type)
+
 
 class User(AbstractUser):
     username_validator = UsernameValidatorAllowSpace()
@@ -100,9 +103,18 @@ class RetroBoardItems(TrackableDateModel):
 class Story(models.Model):
     title = models.CharField(max_length=50)
     description = models.CharField(max_length=100, null=True, blank=True)
-    story_points = models.IntegerField()
+    story_points = models.IntegerField(null=True, blank=True)
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
     key = models.CharField(max_length=10, null=True)
 
     def __str__(self):
         return self.title
+
+
+class Card(models.Model):
+    card = models.IntegerField()
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+    )
+    session = models.ForeignKey(Session, on_delete=models.CASCADE)
+    story = models.ForeignKey(Story, on_delete=models.CASCADE)
