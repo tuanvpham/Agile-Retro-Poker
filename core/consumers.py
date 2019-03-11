@@ -423,3 +423,170 @@ class PokerConsumer(WebsocketConsumer):
             'end_game': end_game,
             'story': story
         }))
+
+
+class LobbyConsumer(WebsocketConsumer):
+    def connect(self):
+        session = get_session_object(
+            self.scope['url_route']['kwargs']['session_name']
+        )
+
+        if session is not None:
+            self.room_name = session.title
+            self.room_group_name = 'session_%s' % self.room_name
+
+            async_to_sync(self.channel_layer.group_add)(
+                self.room_group_name,
+                self.channel_name
+            )
+            self.accept()
+        else:
+            self.close()
+
+    def disconnect(self, close_code):
+        # Leave session
+        print('DISCONNECT - WEBSOCKET CLOSED')
+        async_to_sync(self.channel_layer.group_discard)(
+            self.room_group_name,
+            self.channel_name
+        )
+
+    def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        session = get_session_object(
+            self.scope['url_route']['kwargs']['session_name']
+        )
+        if 'has_joined' in text_data_json:
+            has_joined = text_data_json['has_joined']
+            player = text_data_json['player']
+            try:
+                user = User.objects.get(email=player)
+            except User.DoesNotExist:
+                user = None
+
+            if user is not None:
+                try:
+                    member = SessionMember.objects.get(
+                        session=session,
+                        member=user
+                    )
+                except SessionMember.DoesNotExist:
+                    member = None
+
+                if member is not None:
+                    has_joined = 'User already joined the session'
+                else:
+                    has_joined = 'New player joined the session'
+                    new_member = SessionMember.objects.create(
+                        session=session, member=self.scope['user']
+                    )
+                    new_member.save()
+
+                async_to_sync(self.channel_layer.group_send)(
+                    self.room_group_name,
+                    {
+                        'type': 'has_joined',
+                        'has_joined': has_joined,
+                        'player': user.username
+                    }
+                )
+            else:
+                print("User does not exist!")
+        elif 'start_game' in text_data_json:
+            start_game = text_data_json['start_game']
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'start_game',
+                    'start_game': start_game
+                }
+            )
+        elif 'display_retro' in text_data_json:
+            display_retro = text_data_json['display_retro']
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'display_retro',
+                    'display_retro': display_retro
+                }
+            )
+        elif 'cancel_game' in text_data_json:
+            cancel_game = text_data_json['cancel_game']
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'cancel_game',
+                    'display_retro': cancel_game
+                }
+            )
+        elif 'exit_game' in text_data_json:
+            exit_game = text_data_json['exit_game']
+            player = text_data_json['player']
+            try:
+                user = User.objects.get(email=player)
+            except User.DoesNotExist:
+                user = None
+
+            if user is not None:
+                try:
+                    member = SessionMember.objects.get(
+                        session=session,
+                        member=user
+                    )
+                except SessionMember.DoesNotExist:
+                    member = None
+
+                if member is not None:
+                    member = SessionMember.objects.get(
+                        session=session,
+                        member=self.scope['user']
+                    )
+                    member.delete()
+                    exit_game = 'User has left the session'
+                else:
+                    exit_game = 'There is no user like this in session'
+
+                async_to_sync(self.channel_layer.group_send)(
+                    self.room_group_name,
+                    {
+                        'type': 'exit_game',
+                        'exit_game': exit_game,
+                        'player': user.username
+                    }
+                )
+            else:
+                print('User does not exist')
+
+    def has_joined(self, event):
+        has_joined = event['has_joined']
+        player = event['player']
+        self.send(text_data=json.dumps({
+            'has_joined': has_joined,
+            'player': player
+        }))
+
+    def start_game(self, event):
+        start_game = event['start_game']
+        self.send(text_data=json.dumps({
+            'start_game': start_game
+        }))
+
+    def display_retro(self, event):
+        display_retro = event['display_retro']
+        self.send(text_data=json.dumps({
+            'display_retro': display_retro
+        }))
+
+    def cancel_game(self, event):
+        cancel_game = event['cancel_game']
+        self.send(text_data=json.dumps({
+            'cancel_game': cancel_game
+        }))
+
+    def exit_game(self, event):
+        exit_game = event['exit_game']
+        player = event['player']
+        self.send(text_data=json.dumps({
+            'exit_game': exit_game,
+            'player': player
+        }))
