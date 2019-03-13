@@ -125,6 +125,16 @@ def current_user(request):
     return Response(serializer.data)
 
 
+@api_view(['POST'])
+def delete_session(request):
+    try:
+        session = Session.objects.get(id=request.data['session'])
+        session.delete()
+        return Response(status=status.HTTP_200_OK)
+    except:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
 class SessionCreate(APIView):
     '''
     Fetch and create sessions
@@ -136,20 +146,29 @@ class SessionCreate(APIView):
         return Response(session_serializer.data)
 
     def post(self, request, format=None):
-        session_serializer = SessionSerializer(
-            data=request.data,
-            context={'request': request}
-        )
-        if session_serializer.is_valid():
-            session_serializer.save()
-            return Response(
-                session_serializer.data,
-                status=status.HTTP_201_CREATED
+        try:
+            owner = User.objects.get(username=request.data['username'])
+            print(request.data['session_type'])
+            type = "R"
+            if(request.data['session_type'] == "poker"):
+                type = "P"
+            session = Session(
+                title=request.data['title'],
+                session_type=type,
+                owner=owner
             )
-        return Response(
-            session_serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
+            session.save()
+            response_data = ({
+                'id': session.id,
+                'title': session.title,
+                'session_type': session.session_type
+            })
+            return Response(
+                data=response_data, 
+                status=status.HTTP_200_OK
+            )
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class RetroBoardItemsList(generics.ListAPIView):

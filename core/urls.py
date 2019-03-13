@@ -13,6 +13,7 @@ urlpatterns = [
     path('oauth_user/', views.oauth_user),
     path('current-user/', views.current_user),
     path('sessions/', views.SessionCreate.as_view()),
+    path('delete_session/', views.delete_session),
     path('retro-board-items/', views.RetroBoardItemsList.as_view()),
     path('stories/', views.StoryItemList.as_view()),
     path('story_select/', views.StorySelectList.as_view()),
