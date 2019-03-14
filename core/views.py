@@ -179,6 +179,18 @@ class RetroBoardItemsList(generics.ListAPIView):
     serializer_class = RetroBoardItemsSerializer
 
 
+@api_view(['POST'])
+def remove_stories(request):
+    try:
+        stories = request.data['stories']
+        for story in stories:
+            if(story['selected'] == False):
+                Story.objects.get(id=story['id']).delete()
+        return Response(status=status.HTTP_200_OK)
+    except:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
 class StoryItemList(generics.ListAPIView):
     '''
     Returns all story items
@@ -348,13 +360,9 @@ def end_poker(request):
             oauth=jira_options
         )
         current_session = Session.objects.get(id=request.data['session'])
-        new_stories = Story.objects.filter(session=current_session)
-        old_stories = jac.search_issues('issueType=Story')
-        for ns in new_stories:
-            for os in old_stories:
-                if(ns.key == os.key):
-                    os.update(customfield_10024=ns.story_points)
-                    break
+        stories = Story.objects.filter(session=current_session)
+        for story in stories:
+            jac.issue(story.key).update(customfield_10024=story.story_points)
         current_session.delete()
         return Response(status=status.HTTP_200_OK)
     except:
