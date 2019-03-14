@@ -20,6 +20,8 @@ urlpatterns = [
     path('session-owner/', views.check_session_owner),
     path('session-members/<int:session_id>/', views.SessionMemberList.as_view()),
     path('end_retro/', views.end_retro),
+    path('end_poker/', views.end_poker),
+    path('update_points/', views.update_points),
     path('stories/<int:session_id>/', views.Stories.as_view()),
     path('cards/<int:session_id>/<int:story_id>/', views.Cards.as_view())
 ]

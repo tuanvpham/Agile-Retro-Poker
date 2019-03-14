@@ -148,7 +148,6 @@ class SessionCreate(APIView):
     def post(self, request, format=None):
         try:
             owner = User.objects.get(username=request.data['username'])
-            print(request.data['session_type'])
             type = "R"
             if(request.data['session_type'] == "poker"):
                 type = "P"
@@ -191,7 +190,7 @@ class StoryItemList(generics.ListAPIView):
 
 class StorySelectList(APIView):
     '''
-    Returns all stories from Jira backlog for Planning Poker and updates them when done
+    Returns all stories from Jira backlog for Planning Poker
     '''
 
     def post(self, request, format=None):
@@ -207,22 +206,19 @@ class StorySelectList(APIView):
                 oauth=jira_options
             )
             stories = jac.search_issues('issueType=Story')
+            session_id = Session.objects.get(id=request.data['session'])
             for story in stories:
-                story_serializer = StorySerializer(data={
-                    'session': request.data['session'],
-                    'title': story.fields.id,
-                    'description': story.feilds.description,
-                    'story_points': story.fields.customfield_10024,
-                    'key': story.key}
+                story = Story(
+                    title=story.fields.summary,
+                    description=story.fields.description,
+                    story_points=story.fields.customfield_10024,
+                    session=session_id,
+                    key=story.key
                 )
-                if(story_serializer.is_valid):
-                    story_serializer.save()
+                story.save()
+            return Response(data={'message': "Successfully retrieved from Jira"}, status=status.HTTP_200_OK)
         except:
-            return Response(
-                story_serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        return Response(story_serializer.data, status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -253,10 +249,13 @@ class SessionMemberList(APIView):
 
 @api_view(['POST'])
 def update_points(request):
-    story = Story.objects.get(id=request.data['id'])
-    story.story_points = request.data['points']
-    story.save(update_fields=["story_points"])
-    return Response(status=status.HTTP_200_OK)
+    try:
+        story = Story.objects.get(key=request.data['key'])
+        story.story_points = request.data['points']
+        story.save(update_fields=["story_points"])
+        return Response(status=status.HTTP_200_OK)
+    except:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -321,6 +320,17 @@ class Cards(APIView):
 
 
 @api_view(['POST'])
+def update_points(request):
+    try:
+        story = Story.objects.get(key=request.data['key'])
+        story.story_points = request.data['points']
+        story.save(update_fields=["story_points"])
+        return Response(status=status.HTTP_200_OK)
+    except:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
 def end_poker(request):
     '''
     Update all stories in the database in Jira when Planning Poker session ends
@@ -337,15 +347,15 @@ def end_poker(request):
             options={'server': JIRA_SERVER},
             oauth=jira_options
         )
-        new_stories = Story.objects.get(session=request.data['session'])
+        current_session = Session.objects.get(id=request.data['session'])
+        new_stories = Story.objects.filter(session=current_session)
         old_stories = jac.search_issues('issueType=Story')
         for ns in new_stories:
             for os in old_stories:
                 if(ns.key == os.key):
-                    os.update(fields={'customfield_10024': ns.story_points})
+                    os.update(customfield_10024=ns.story_points)
                     break
-        session = Session.objects.get(id=request.data['session'])
-        session.delete()
+        current_session.delete()
         return Response(status=status.HTTP_200_OK)
     except:
         return Response(status=status.HTTP_400_BAD_REQUEST)
