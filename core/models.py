@@ -33,6 +33,7 @@ class Session(models.Model):
             ('P', 'Poker'),
         )
     session_type = models.CharField(max_length=10, choices=TYPES)
+    is_started = models.BooleanField(default=False)
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE
     )

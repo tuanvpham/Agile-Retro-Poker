@@ -12,32 +12,17 @@ class RetroConsumer(WebsocketConsumer):
         session = get_session_object(
             self.scope['url_route']['kwargs']['session_name']
         )
-        try:
-            member = SessionMember.objects.get(
-                session=session,
-                member=self.scope['user']
-            )
-        except SessionMember.DoesNotExist:
-            member = None
 
         if session is not None:
             self.room_name = session.title
             self.room_group_name = 'session_%s' % self.room_name
 
-            if member is None:
-                new_member = SessionMember.objects.create(
-                    session=session, member=self.scope['user']
-                )
-                new_member.save()
-
-            # Join session
             async_to_sync(self.channel_layer.group_add)(
                 self.room_group_name,
                 self.channel_name
             )
             self.accept()
         else:
-            # print('DISCONNECT - MISSING SESSION')
             self.close()
 
     def disconnect(self, close_code):
@@ -242,32 +227,17 @@ class PokerConsumer(WebsocketConsumer):
         session = get_session_object(
             self.scope['url_route']['kwargs']['session_name']
         )
-        try:
-            member = SessionMember.objects.get(
-                session=session,
-                member=self.scope['user']
-            )
-        except SessionMember.DoesNotExist:
-            member = None
 
         if session is not None:
             self.room_name = session.title
             self.room_group_name = 'session_%s' % self.room_name
 
-            if member is None:
-                new_member = SessionMember.objects.create(
-                    session=session, member=self.scope['user']
-                )
-                new_member.save()
-
-            # Join session
             async_to_sync(self.channel_layer.group_add)(
                 self.room_group_name,
                 self.channel_name
             )
             self.accept()
         else:
-            print('DISCONNECT - MISSING SESSION')
             self.close()
 
     def disconnect(self, close_code):
@@ -431,7 +401,7 @@ class LobbyConsumer(WebsocketConsumer):
             self.scope['url_route']['kwargs']['session_name']
         )
 
-        if session is not None:
+        if session is not None and session.is_started is False:
             self.room_name = session.title
             self.room_group_name = 'session_%s' % self.room_name
 
@@ -494,6 +464,8 @@ class LobbyConsumer(WebsocketConsumer):
                 print("User does not exist!")
         elif 'start_game' in text_data_json:
             start_game = text_data_json['start_game']
+            session.is_started = True
+            session.save(update_fields=['is_started'])
             async_to_sync(self.channel_layer.group_send)(
                 self.room_group_name,
                 {

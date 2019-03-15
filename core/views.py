@@ -330,3 +330,29 @@ def end_poker(request):
         return Response(status=status.HTTP_200_OK)
     except:
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def check_session_started(request):
+    try:
+        current_session = Session.objects.get(
+            title=request.data['session_title']
+        )
+    except Session.DoesNotExist:
+        current_session = None
+
+    if current_session is None:
+        data = {
+            'error': 'Session does not exits'
+        }
+    else:
+        if current_session.is_started is True:
+            data = {
+                'is_started': True
+            }
+        else:
+            data = {
+                'is_started': False
+            }
+
+    return Response(data)
