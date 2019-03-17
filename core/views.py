@@ -163,7 +163,7 @@ class SessionCreate(APIView):
                 'session_type': session.session_type
             })
             return Response(
-                data=response_data, 
+                data=response_data,
                 status=status.HTTP_200_OK
             )
         except:
@@ -184,7 +184,7 @@ def remove_stories(request):
     try:
         stories = request.data['stories']
         for story in stories:
-            if(story['selected'] == False):
+            if(story['selected'] is False):
                 Story.objects.get(id=story['id']).delete()
         return Response(status=status.HTTP_200_OK)
     except:
