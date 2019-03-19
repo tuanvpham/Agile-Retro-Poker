@@ -542,6 +542,7 @@ class LobbyConsumer(WebsocketConsumer):
         self.send(text_data=json.dumps({
             'start_game': start_game
         }))
+        self.close()
 
     def display_retro(self, event):
         display_retro = event['display_retro']

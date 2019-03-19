@@ -125,6 +125,16 @@ def current_user(request):
     return Response(serializer.data)
 
 
+@api_view(['POST'])
+def delete_session(request):
+    try:
+        session = Session.objects.get(id=request.data['session'])
+        session.delete()
+        return Response(status=status.HTTP_200_OK)
+    except:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
 class SessionCreate(APIView):
     '''
     Fetch and create sessions
@@ -136,20 +146,28 @@ class SessionCreate(APIView):
         return Response(session_serializer.data)
 
     def post(self, request, format=None):
-        session_serializer = SessionSerializer(
-            data=request.data,
-            context={'request': request}
-        )
-        if session_serializer.is_valid():
-            session_serializer.save()
-            return Response(
-                session_serializer.data,
-                status=status.HTTP_201_CREATED
+        try:
+            owner = User.objects.get(username=request.data['username'])
+            type = "R"
+            if(request.data['session_type'] == "poker"):
+                type = "P"
+            session = Session(
+                title=request.data['title'],
+                session_type=type,
+                owner=owner
             )
-        return Response(
-            session_serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
+            session.save()
+            response_data = ({
+                'id': session.id,
+                'title': session.title,
+                'session_type': session.session_type
+            })
+            return Response(
+                data=response_data,
+                status=status.HTTP_200_OK
+            )
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class RetroBoardItemsList(generics.ListAPIView):
@@ -159,6 +177,18 @@ class RetroBoardItemsList(generics.ListAPIView):
 
     queryset = RetroBoardItems.objects.all()
     serializer_class = RetroBoardItemsSerializer
+
+
+@api_view(['POST'])
+def remove_stories(request):
+    try:
+        stories = request.data['stories']
+        for story in stories:
+            if(story['selected'] is False):
+                Story.objects.get(id=story['id']).delete()
+        return Response(status=status.HTTP_200_OK)
+    except:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class StoryItemList(generics.ListAPIView):
@@ -172,7 +202,7 @@ class StoryItemList(generics.ListAPIView):
 
 class StorySelectList(APIView):
     '''
-    Returns all stories from Jira backlog for Planning Poker and updates them when done
+    Returns all stories from Jira backlog for Planning Poker
     '''
 
     def post(self, request, format=None):
@@ -188,22 +218,19 @@ class StorySelectList(APIView):
                 oauth=jira_options
             )
             stories = jac.search_issues('issueType=Story')
+            session_id = Session.objects.get(id=request.data['session'])
             for story in stories:
-                story_serializer = StorySerializer(data={
-                    'session': request.data['session'],
-                    'title': story.fields.id,
-                    'description': story.feilds.description,
-                    'story_points': story.fields.customfield_10024,
-                    'key': story.key}
+                story = Story(
+                    title=story.fields.summary,
+                    description=story.fields.description,
+                    story_points=story.fields.customfield_10024,
+                    session=session_id,
+                    key=story.key
                 )
-                if(story_serializer.is_valid):
-                    story_serializer.save()
+                story.save()
+            return Response(data={'message': "Successfully retrieved from Jira"}, status=status.HTTP_200_OK)
         except:
-            return Response(
-                story_serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        return Response(story_serializer.data, status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -234,10 +261,13 @@ class SessionMemberList(APIView):
 
 @api_view(['POST'])
 def update_points(request):
-    story = Story.objects.get(id=request.data['id'])
-    story.story_points = request.data['points']
-    story.save(update_fields=["story_points"])
-    return Response(status=status.HTTP_200_OK)
+    try:
+        story = Story.objects.get(key=request.data['key'])
+        story.story_points = request.data['points']
+        story.save(update_fields=["story_points"])
+        return Response(status=status.HTTP_200_OK)
+    except:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -302,6 +332,17 @@ class Cards(APIView):
 
 
 @api_view(['POST'])
+def update_points(request):
+    try:
+        story = Story.objects.get(key=request.data['key'])
+        story.story_points = request.data['points']
+        story.save(update_fields=["story_points"])
+        return Response(status=status.HTTP_200_OK)
+    except:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
 def end_poker(request):
     '''
     Update all stories in the database in Jira when Planning Poker session ends
@@ -318,15 +359,11 @@ def end_poker(request):
             options={'server': JIRA_SERVER},
             oauth=jira_options
         )
-        new_stories = Story.objects.get(session=request.data['session'])
-        old_stories = jac.search_issues('issueType=Story')
-        for ns in new_stories:
-            for os in old_stories:
-                if(ns.key == os.key):
-                    os.update(fields={'customfield_10024': ns.story_points})
-                    break
-        session = Session.objects.get(id=request.data['session'])
-        session.delete()
+        current_session = Session.objects.get(id=request.data['session'])
+        stories = Story.objects.filter(session=current_session)
+        for story in stories:
+            jac.issue(story.key).update(customfield_10024=story.story_points)
+        current_session.delete()
         return Response(status=status.HTTP_200_OK)
     except:
         return Response(status=status.HTTP_400_BAD_REQUEST)
