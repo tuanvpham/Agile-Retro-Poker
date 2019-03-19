@@ -211,6 +211,7 @@ class RetroConsumer(WebsocketConsumer):
             'session_owner': session_owner,
             'end_session_message': end_session_message
         }))
+        self.close()
 
     def exit_session_by_user(self, event):
         exit_session_message = event['message']
@@ -219,6 +220,7 @@ class RetroConsumer(WebsocketConsumer):
             'member': member,
             'exit_session_message': exit_session_message
         }))
+        self.close()
 
 
 class PokerConsumer(WebsocketConsumer):
