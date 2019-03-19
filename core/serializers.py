@@ -75,6 +75,7 @@ class SessionSerializer(serializers.ModelSerializer):
             'title',
             'description',
             'session_type',
+            'is_started',
             'owner_id',
             'owner_username',
             'owner_email'

@@ -23,6 +23,7 @@ urlpatterns = [
     path('end_poker/', views.end_poker),
     path('update_points/', views.update_points),
     path('stories/<int:session_id>/', views.Stories.as_view()),
+    path('session-started/', views.check_session_started),
     path('remove_stories/', views.remove_stories),
     path('cards/<int:session_id>/<int:story_id>/', views.Cards.as_view())
 ]
