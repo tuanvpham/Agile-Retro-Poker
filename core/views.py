@@ -148,24 +148,31 @@ class SessionCreate(APIView):
     def post(self, request, format=None):
         try:
             owner = User.objects.get(username=request.data['username'])
-            type = "R"
-            if(request.data['session_type'] == "poker"):
-                type = "P"
-            session = Session(
-                title=request.data['title'],
-                session_type=type,
-                owner=owner
-            )
-            session.save()
-            response_data = ({
-                'id': session.id,
-                'title': session.title,
-                'session_type': session.session_type
-            })
-            return Response(
-                data=response_data,
-                status=status.HTTP_200_OK
-            )
+            session = get_session_object(request.data['title'])
+            if session is None:
+                session_type = "R"
+                if request.data['session_type'] == "poker":
+                    session_type = "P"
+                session = Session(
+                    title=request.data['title'],
+                    session_type=session_type,
+                    owner=owner
+                )
+                session.save()
+                response_data = ({
+                    'id': session.id,
+                    'title': session.title,
+                    'session_type': session.session_type
+                })
+                return Response(
+                    data=response_data,
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    data={'error_message': "Duplicate title. Please choose another name for title"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
