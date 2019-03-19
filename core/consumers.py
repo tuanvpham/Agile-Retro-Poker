@@ -395,6 +395,7 @@ class PokerConsumer(WebsocketConsumer):
             'end_game': end_game,
             'story': story
         }))
+        self.close()
 
 
 class LobbyConsumer(WebsocketConsumer):
