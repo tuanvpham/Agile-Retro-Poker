@@ -147,12 +147,12 @@ class SessionCreate(APIView):
 
     def post(self, request, format=None):
         try:
-            owner = get_user_object(request.data['email'])
+            owner = User.objects.get(username=request.data['username'])
             session = get_session_object(request.data['title'])
             if session is None:
-                session_type = 'R'
-                if request.data['session_type'] == 'poker':
-                    session_type = 'P'
+                session_type = "R"
+                if request.data['session_type'] == "poker":
+                    session_type = "P"
                 session = Session(
                     title=request.data['title'],
                     session_type=session_type,
@@ -162,8 +162,7 @@ class SessionCreate(APIView):
                 response_data = ({
                     'id': session.id,
                     'title': session.title,
-                    'session_type': session.session_type,
-                    'owner': owner.username
+                    'session_type': session.session_type
                 })
                 return Response(
                     data=response_data,
