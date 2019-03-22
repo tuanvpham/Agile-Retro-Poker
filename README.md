@@ -7,16 +7,18 @@ These instructions will get you a copy of the project up and running on your loc
 ### Installation
 #### Django
 1. Clone project
-2. ```pip install virtualenv``` (*)
+2. Install virtualenv (make sure you have pip on your machine)
+
+    ```
+    pip install virtualenv
+    ```
 3. ```cd Group10-Agile-Command-Central-API```
-4. ```virtualenv env -p python3``` (*)
+4. ```virtualenv env -p python3```
 5. ```source env/bin/activate```
 6. ```pip install -r requirements.txt```
 7. ```python manage.py migrate```
-8. Install Pep8, MySQL, Redis (*)
-9. ```python manage.py runserver```
-
-Note: * skip this step if this is not the first time you set up the project
+8. To run the app: ```python manage.py runserver```
+9. You will see a portal to the project on terminal (something like http://127.0.0.1:8000/).
 
 #### Pep8 Style Guide
 - Visual Studio Code: https://code.visualstudio.com/docs/python/linting
@@ -34,43 +36,32 @@ Note: * skip this step if this is not the first time you set up the project
 5. ```CREATE USER group10@localhost IDENTIFIED BY 'password';```
 6. ```GRANT ALL PRIVILEGES ON agilecommandcentral.* TO group10@localhost;```
 
-#### Redis for Django Channels (Linux)
-- ```brew install redis```
-- ```brew services start redis```
+- From agilecommandcentral project directory, run 
+1. ```python manage.py makemigrations```
+2. ```python manage.py migrate```
+3. ```python manage.py runserver```
 
-#### Redis (Windows)
-- https://www.youtube.com/watch?v=ncFhlv-gBXQ
 
 ## Running tests
-- Coverage
+1. Coverage
     - Everytime you add some code to the project run this: ```coverage run --source ='.' manage.py test```
     - Read coverage report: ```coverage report```
-- Jira shell
+2. Jira shell
     - Play with Jira API: ```jirashell -s jira-board-url```
-
-## Postman API calls
-1. API Login
-
-![login api](/postman_login.png)
-
-2. Make API calls
-
-![api call](/postman_apicall_2.png)
-![api call](/postman_apicall.png)
 
 ## Deployment
 How to deploy...
 
 ## Built With
-* Django - Backend API
-* React - Frontend Web
+* Django - Web framework
+* React - Front End
 * Jira API - Integration
 * AWS - Deployment
 * iOS - Mobile Development
 
 ## Authors
-* Katherine Rosenfeld - Frontend Web
-* Kyle Capehart - Database, Jira API
-* Lee Alan Wildes - AWS
+* Katherine Rosenfeld - Front End
+* Kyle Capehart - Database, AWS, Jira API
+* Lee Alan Wildes - AWS, Front End
 * Leonardo Araque - Mobile Development
-* Tuan Pham - Backend API
+* Tuan Pham - Backend, REST API, Jira API

@@ -83,10 +83,10 @@ WSGI_APPLICATION = 'agilecommandcentral.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'KyleDBAdmin',
-        'USER': 'KyleDBAdmin',
-        'PASSWORD': 'KyleCaKeFaRt100!!',
-        'HOST': 'dacc.cn6ier2gilv6.us-east-2.rds.amazonaws.com',
+        'NAME': 'agilecommandcentral',
+        'USER': 'group10',
+        'PASSWORD': 'password',
+        'HOST': 'localhost',
         'PORT': '',
     }
 }
@@ -158,12 +158,12 @@ JWT_AUTH = {
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-#ASGI_APPLICATION = "agilecommandcentral.routing.application"
-#CHANNEL_LAYERS = {
-#    'default': {
-#        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-#        'CONFIG': {
-#            "hosts": [('127.0.0.1', 6379)],
-#        },
-#    },
-#}
+ASGI_APPLICATION = "agilecommandcentral.routing.application"
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
