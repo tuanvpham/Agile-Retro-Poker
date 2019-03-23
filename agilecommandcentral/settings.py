@@ -25,7 +25,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'nokc_1a3rphmia4g*gxu!ho80rv4dqo*kabm(10jrvhd4g*$6e'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # Development
 ALLOWED_HOSTS = ['*']
@@ -83,10 +83,10 @@ WSGI_APPLICATION = 'agilecommandcentral.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'agilecommandcentral',
-        'USER': 'group10',
-        'PASSWORD': 'password',
-        'HOST': 'localhost',
+        'NAME': 'KyleDBAdmin',
+        'USER': 'KyleDBAdmin',
+        'PASSWORD': 'KyleCaKeFaRt100!!',
+        'HOST': 'dacc.cn6ier2gilv6.us-east-2.rds.amazonaws.com',
         'PORT': '',
     }
 }
@@ -150,11 +150,6 @@ JWT_AUTH = {
     'JWT_RESPONSE_PAYLOAD_HANDLER': 'core.views.my_jwt_response_handler',
     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=2),
 }
-
-
-# CORS_ORIGIN_WHITELIST = (
-#     'localhost:3000',
-# )
 
 CORS_ORIGIN_ALLOW_ALL = True
 
