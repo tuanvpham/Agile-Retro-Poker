@@ -27,10 +27,12 @@ SECRET_KEY = 'nokc_1a3rphmia4g*gxu!ho80rv4dqo*kabm(10jrvhd4g*$6e'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-# Development
+
 ALLOWED_HOSTS = ['*']
 
+
 # Application definition
+
 INSTALLED_APPS = [
     'channels',
     'rest_framework',
@@ -135,6 +137,9 @@ AUTHENTICATION_BACKENDS = (
     'core.auth_backend.EmailPasswordlessAuthBackend',
 )
 
+# Change this when we have frontend instance
+# CORS_ORIGIN_ALLOW_ALL = False
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -148,7 +153,7 @@ REST_FRAMEWORK = {
 
 JWT_AUTH = {
     'JWT_RESPONSE_PAYLOAD_HANDLER': 'core.views.my_jwt_response_handler',
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=2),
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=2),
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
