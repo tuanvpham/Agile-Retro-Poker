@@ -25,7 +25,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'nokc_1a3rphmia4g*gxu!ho80rv4dqo*kabm(10jrvhd4g*$6e'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 # Development
 ALLOWED_HOSTS = ['*']
@@ -87,7 +87,7 @@ DATABASES = {
         'USER': 'KyleDBAdmin',
         'PASSWORD': 'KyleCaKeFaRt100!!',
         'HOST': 'dacc.cn6ier2gilv6.us-east-2.rds.amazonaws.com',
-        'PORT': '',
+        'PORT': '3306',
     }
 }
 
@@ -158,7 +158,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+            "hosts": [("dacc.tovdvi.0001.use2.cache.amazonaws.com", 6379)],
         },
     },
 }
