@@ -229,7 +229,8 @@ class RetroConsumer(WebsocketConsumer):
                     'item_id': retro_board_item.id,
                     'item_owner': self.scope['user'].username,
                     'item_type': retro_board_item.item_type,
-                    'item_text': item_text
+                    'item_text': item_text,
+                    'session': self.scope['url_route']['kwargs']['session_name']
                 }
             )
 
@@ -262,12 +263,14 @@ class RetroConsumer(WebsocketConsumer):
         item_owner = event['item_owner']
         item_type = event['item_type']
         item_text = event['item_text']
+        session = event['session']
 
         self.send(text_data=json.dumps({
             'id': item_id,
             'item_owner': item_owner,
             'item_type': item_type,
-            'item_text':  item_text
+            'item_text':  item_text,
+            'session': session
         }))
 
     def end_session_by_owner(self, event):
