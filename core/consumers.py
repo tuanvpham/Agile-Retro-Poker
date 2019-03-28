@@ -231,7 +231,6 @@ class RetroConsumer(WebsocketConsumer):
                     'item_type': retro_board_item.item_type,
                     'item_text': item_text,
                     'session': self.scope['url_route']['kwargs']['session_name']
- 
                 }
             )
 
@@ -521,7 +520,7 @@ class LobbyConsumer(WebsocketConsumer):
                 else:
                     has_joined = 'New player joined the session'
                     new_member = SessionMember.objects.create(
-                        session=session, member=self.scope['user']
+                        session=session, member=user
                     )
                     new_member.save()
 
