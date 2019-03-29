@@ -268,17 +268,6 @@ class SessionMemberList(APIView):
 
 
 @api_view(['POST'])
-def update_points(request):
-    try:
-        story = Story.objects.get(id=request.data['id'])
-        story.story_points = request.data['points']
-        story.save(update_fields=["story_points"])
-        return Response(status=status.HTTP_200_OK)
-    except:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
-@api_view(['POST'])
 def end_retro(request):
     '''
     When a retro session ends, post all action items to Jira
@@ -305,8 +294,8 @@ def end_retro(request):
             jac.create_issue(
                 project='AG',
                 summary=i.item_text,
-                issuetype={'name': 'Task'},
-                description="Access Item from Retro Session: " + session.title
+                issuetype={'name': 'Story'},
+                description="Action Item from Retro Session: " + session.title
             )
         session.delete()
         return Response(status=status.HTTP_200_OK)
@@ -342,7 +331,7 @@ class Cards(APIView):
 @api_view(['POST'])
 def update_points(request):
     try:
-        story = Story.objects.get(key=request.data['key'])
+        story = Story.objects.get(id=request.data['id'])
         story.story_points = request.data['points']
         story.save(update_fields=["story_points"])
         return Response(status=status.HTTP_200_OK)
