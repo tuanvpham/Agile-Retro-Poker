@@ -294,7 +294,7 @@ def end_retro(request):
             jac.create_issue(
                 project='AG',
                 summary=i.item_text,
-                issuetype={'name': 'Task'},
+                issuetype={'name': 'Story'},
                 description="Access Item from Retro Session: " + session.title
             )
         session.delete()
