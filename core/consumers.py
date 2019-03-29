@@ -50,6 +50,8 @@ class HomeConsumer(WebsocketConsumer):
                     'session_id': session_id
                 }
             )
+        elif 'close_socket' in text_data_json:
+            self.close()
 
     def create_session(self, event):
         session_type = event['session_type']
@@ -410,6 +412,8 @@ class PokerConsumer(WebsocketConsumer):
                     'story': text_data_json['story']
                 }
             )
+        elif 'close_socket' in text_data_json:
+            self.close()
 
     def toggle_next_story(self, event):
         toggle_next_story = event['toggle_next_story']
