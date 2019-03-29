@@ -295,7 +295,7 @@ def end_retro(request):
                 project='AG',
                 summary=i.item_text,
                 issuetype={'name': 'Story'},
-                description="Access Item from Retro Session: " + session.title
+                description="Action Item from Retro Session: " + session.title
             )
         session.delete()
         return Response(status=status.HTTP_200_OK)
