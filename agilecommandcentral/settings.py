@@ -22,7 +22,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ['SECRET_KEY']
+SECRET_KEY = os.environ.get('SECRET_KEY', "default_value")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -83,10 +83,10 @@ WSGI_APPLICATION = 'agilecommandcentral.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ['NAME'],
-        'USER': os.environ['NAME'],
-        'PASSWORD': os.environ['PASSWORD'],
-        'HOST': os.environ['HOST'],
+        'NAME': os.environ.get('NAME', "default_value"),
+        'USER': os.environ.get('NAME', "default_value"),
+        'PASSWORD': os.environ.get('PASSWORD', "default_value"),
+        'HOST': os.environ.get('HOST', "default_value"),
         'PORT': '3306',
     }
 }
