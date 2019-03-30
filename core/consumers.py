@@ -587,7 +587,7 @@ class LobbyConsumer(WebsocketConsumer):
                 if member is not None:
                     member = SessionMember.objects.get(
                         session=session,
-                        member=self.scope['user']
+                        member=user
                     )
                     member.delete()
                     exit_game = 'User has left the session'
