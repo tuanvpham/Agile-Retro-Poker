@@ -36,7 +36,7 @@ def connect_1():
 
     redir_url = (AUTHORIZE_URL + "?oauth_token=" +
                 request_token['oauth_token'] +
-                "&oauth_callback=http://agilecentralcommand.us-east-2.elasticbeanstalk.com//oauth_user" +
+                "&oauth_callback=http://localhost:3000/oauth_user" +
                 "?oauth_token_secret=" + resource_owner_secret)
 
     access_tokens = {
