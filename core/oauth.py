@@ -13,9 +13,9 @@ def read(file_path):
 
 # The Consumer Key created while setting up the "Incoming Authentication" in
 # JIRA for the Application Link.
-CONSUMER_KEY = os.environ['OauthKey']
-CONSUMER_SECRET = os.environ['dont_care']
-VERIFIER = os.environ['jira_verifier']
+CONSUMER_KEY = os.environ['CONSUMER_KEY']
+CONSUMER_SECRET = os.environ['CONSUMER_SECRET']
+VERIFIER = os.environ['CONSUMER_SECRET']
 
 # The contents of the rsa.pem file generated (the private RSA key)
 RSA_KEY = read('jira_privatekey.pem')
