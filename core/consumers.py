@@ -564,7 +564,7 @@ class LobbyConsumer(WebsocketConsumer):
                 self.room_group_name,
                 {
                     'type': 'cancel_game',
-                    'display_retro': cancel_game
+                    'cancel_game': cancel_game
                 }
             )
         elif 'exit_game' in text_data_json:
