@@ -2,6 +2,7 @@ import requests
 from oauthlib.oauth1 import SIGNATURE_RSA
 from requests_oauthlib import OAuth1Session
 from jira.client import JIRA
+import os
 
 
 def read(file_path):
