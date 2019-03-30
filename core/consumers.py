@@ -631,7 +631,6 @@ class LobbyConsumer(WebsocketConsumer):
         self.send(text_data=json.dumps({
             'cancel_game': cancel_game
         }))
-        self.close()
 
     def exit_game(self, event):
         exit_game = event['exit_game']
@@ -640,4 +639,3 @@ class LobbyConsumer(WebsocketConsumer):
             'exit_game': exit_game,
             'player': player
         }))
-        self.close()
