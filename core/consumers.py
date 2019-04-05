@@ -41,6 +41,13 @@ class HomeConsumer(WebsocketConsumer):
                     'owner': owner
                 }
             )
+        elif 'create_session_kate' in text_data_json:
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'create_session_kate',
+                }
+            )
         elif 'delete_session' in text_data_json:
             session_id = text_data_json['session_id']
             async_to_sync(self.channel_layer.group_send)(
@@ -48,6 +55,13 @@ class HomeConsumer(WebsocketConsumer):
                 {
                     'type': 'delete_session',
                     'session_id': session_id
+                }
+            )
+        elif 'delete_session_kate' in text_data_json:
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'delete_session_kate',
                 }
             )
         elif 'close_socket' in text_data_json:
@@ -66,11 +80,21 @@ class HomeConsumer(WebsocketConsumer):
             'owner': owner
         }))
 
+    def create_session_kate(self, event):
+        self.send(text_data=json.dumps({
+            'create_session': 'Create a new session',
+        }))
+
     def delete_session(self, event):
         session_id = event['session_id']
         self.send(text_data=json.dumps({
             'delete_session': 'Delete a session',
             'session_id': session_id
+        }))
+    
+    def delete_session_kate(self, event):
+        self.send(text_data=json.dumps({
+            'delete_session': 'Delete a session',
         }))
 
 
