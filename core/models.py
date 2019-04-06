@@ -37,6 +37,13 @@ class Session(models.Model):
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE
     )
+    CARD_TYPES = (
+            ('F', 'FIB'),
+            ('M', 'MODFIB'),
+            ('S', 'SEQ'),
+        )
+    card_type = models.CharField(max_length=10, choices=CARD_TYPES, default='F')
+    velocity = models.IntegerField(null=True, blank=True)
 
     @property
     def group_name(self):
