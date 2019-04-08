@@ -78,7 +78,9 @@ class SessionSerializer(serializers.ModelSerializer):
             'is_started',
             'owner_id',
             'owner_username',
-            'owner_email'
+            'owner_email',
+            'card_type',
+            'velocity'
         )
 
 

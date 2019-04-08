@@ -31,16 +31,30 @@ class HomeConsumer(WebsocketConsumer):
             entered_text = text_data_json['entered_text']
             session_id = text_data_json['session_id']
             owner = text_data_json['owner_username']
-            async_to_sync(self.channel_layer.group_send)(
-                self.room_group_name,
-                {
-                    'type': 'create_session',
-                    'session_type': session_type,
-                    'entered_text': entered_text,
-                    'session_id': session_id,
-                    'owner': owner
-                }
-            )
+            if(session_type == "P"):
+                async_to_sync(self.channel_layer.group_send)(
+                    self.room_group_name,
+                    {
+                        'type': 'create_session_poker',
+                        'session_type': session_type,
+                        'entered_text': entered_text,
+                        'session_id': session_id,
+                        'card_type': text_data_json['card_type'],
+                        'velocity': text_data_json['velocity'],
+                        'owner': owner,
+                    }
+                )
+            else:
+                async_to_sync(self.channel_layer.group_send)(
+                    self.room_group_name,
+                    {
+                        'type': 'create_session',
+                        'session_type': session_type,
+                        'entered_text': entered_text,
+                        'session_id': session_id,
+                        'owner': owner
+                    }
+                )
         elif 'create_session_kate' in text_data_json:
             async_to_sync(self.channel_layer.group_send)(
                 self.room_group_name,
@@ -77,6 +91,23 @@ class HomeConsumer(WebsocketConsumer):
             'session_type': session_type,
             'entered_text': entered_text,
             'session_id': session_id,
+            'owner': owner
+        }))
+
+    def create_session_poker(self, event):
+        session_type = event['session_type']
+        entered_text = event['entered_text']
+        session_id = event['session_id']
+        card_type = event['card_type']
+        velocity = event['velocity']
+        owner = event['owner']
+        self.send(text_data=json.dumps({
+            'create_session_poker': 'Create a new poker session',
+            'session_type': session_type,
+            'entered_text': entered_text,
+            'session_id': session_id,
+            'card_type': card_type,
+            'velocity': velocity,
             'owner': owner
         }))
 
