@@ -153,18 +153,36 @@ class SessionCreate(APIView):
                 session_type = 'R'
                 if request.data['session_type'] == 'poker':
                     session_type = 'P'
-                session = Session(
-                    title=request.data['title'],
-                    session_type=session_type,
-                    owner=owner
-                )
-                session.save()
-                response_data = ({
-                    'id': session.id,
-                    'title': session.title,
-                    'session_type': session.session_type,
-                    'owner': owner.username
-                })
+                if session_type == 'P':
+                    session = Session(
+                        title=request.data['title'],
+                        session_type=session_type,
+                        owner=owner,
+                        card_type=request.data['card_type'],
+                        velocity=request.data['velocity']
+                    )
+                    session.save()
+                    response_data = ({
+                        'id': session.id,
+                        'title': session.title,
+                        'session_type': session.session_type,
+                        'owner': owner.username,
+                        'card_type' : session.card_type,
+                        'velocity' : session.velocity
+                    })
+                else:
+                    session = Session(
+                        title=request.data['title'],
+                        session_type=session_type,
+                        owner=owner
+                    )
+                    session.save()
+                    response_data = ({
+                        'id': session.id,
+                        'title': session.title,
+                        'session_type': session.session_type,
+                        'owner': owner.username
+                    })
                 return Response(
                     data=response_data,
                     status=status.HTTP_200_OK
@@ -294,8 +312,8 @@ def end_retro(request):
             jac.create_issue(
                 project='AG',
                 summary=i.item_text,
-                issuetype={'name': 'Task'},
-                description="Access Item from Retro Session: " + session.title
+                issuetype={'name': 'Story'},
+                description="Action Item from Retro Session: " + session.title
             )
         session.delete()
         return Response(status=status.HTTP_200_OK)

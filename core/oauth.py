@@ -29,8 +29,12 @@ ACCESS_TOKEN_URL = JIRA_SERVER + '/plugins/servlet/oauth/access-token'
 
 def connect_1():
     # Step 1: Get a request token
-    oauth = OAuth1Session(CONSUMER_KEY, signature_type='auth_header',
-                          signature_method=SIGNATURE_RSA, rsa_key=RSA_KEY)
+    oauth = OAuth1Session(
+        CONSUMER_KEY,
+        signature_type='auth_header',
+        signature_method=SIGNATURE_RSA,
+        rsa_key=RSA_KEY
+    )
     request_token = oauth.fetch_request_token(REQUEST_TOKEN_URL)
     resource_owner_key = request_token['oauth_token']
     resource_owner_secret = request_token['oauth_token_secret']

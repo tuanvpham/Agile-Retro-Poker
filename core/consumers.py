@@ -31,14 +31,35 @@ class HomeConsumer(WebsocketConsumer):
             entered_text = text_data_json['entered_text']
             session_id = text_data_json['session_id']
             owner = text_data_json['owner_username']
+            if(session_type == "P"):
+                async_to_sync(self.channel_layer.group_send)(
+                    self.room_group_name,
+                    {
+                        'type': 'create_session_poker',
+                        'session_type': session_type,
+                        'entered_text': entered_text,
+                        'session_id': session_id,
+                        'card_type': text_data_json['card_type'],
+                        'velocity': text_data_json['velocity'],
+                        'owner': owner,
+                    }
+                )
+            else:
+                async_to_sync(self.channel_layer.group_send)(
+                    self.room_group_name,
+                    {
+                        'type': 'create_session',
+                        'session_type': session_type,
+                        'entered_text': entered_text,
+                        'session_id': session_id,
+                        'owner': owner
+                    }
+                )
+        elif 'create_session_kate' in text_data_json:
             async_to_sync(self.channel_layer.group_send)(
                 self.room_group_name,
                 {
-                    'type': 'create_session',
-                    'session_type': session_type,
-                    'entered_text': entered_text,
-                    'session_id': session_id,
-                    'owner': owner
+                    'type': 'create_session_kate',
                 }
             )
         elif 'delete_session' in text_data_json:
@@ -50,6 +71,15 @@ class HomeConsumer(WebsocketConsumer):
                     'session_id': session_id
                 }
             )
+        elif 'delete_session_kate' in text_data_json:
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'delete_session_kate',
+                }
+            )
+        elif 'close_socket' in text_data_json:
+            self.close()
 
     def create_session(self, event):
         session_type = event['session_type']
@@ -64,11 +94,38 @@ class HomeConsumer(WebsocketConsumer):
             'owner': owner
         }))
 
+    def create_session_poker(self, event):
+        session_type = event['session_type']
+        entered_text = event['entered_text']
+        session_id = event['session_id']
+        card_type = event['card_type']
+        velocity = event['velocity']
+        owner = event['owner']
+        self.send(text_data=json.dumps({
+            'create_session_poker': 'Create a new poker session',
+            'session_type': session_type,
+            'entered_text': entered_text,
+            'session_id': session_id,
+            'card_type': card_type,
+            'velocity': velocity,
+            'owner': owner
+        }))
+
+    def create_session_kate(self, event):
+        self.send(text_data=json.dumps({
+            'create_session': 'Create a new session',
+        }))
+
     def delete_session(self, event):
         session_id = event['session_id']
         self.send(text_data=json.dumps({
             'delete_session': 'Delete a session',
             'session_id': session_id
+        }))
+    
+    def delete_session_kate(self, event):
+        self.send(text_data=json.dumps({
+            'delete_session': 'Delete a session',
         }))
 
 
@@ -102,6 +159,12 @@ class RetroConsumer(WebsocketConsumer):
     # Receive message from WebSocket
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
+        is_mobile = False
+        user = None
+        if 'user_email' in text_data_json:
+            is_mobile = True
+            user = get_user_object(text_data_json['user_email'])
+
         if 'end_session' in text_data_json:
             session = get_session_object(
                 self.scope['url_route']['kwargs']['session_name']
@@ -196,9 +259,17 @@ class RetroConsumer(WebsocketConsumer):
                 self.scope['url_route']['kwargs']['session_name']
             )
 
+            if is_mobile:
+                if user is not None:
+                    owner = user
+                else:
+                    print("User does not exist")
+            else:
+                owner = self.scope['user']
+
             if item_type == 'what_went_well':
                 retro_board_item = RetroBoardItems.objects.create(
-                    owner=self.scope['user'],
+                    owner=owner,
                     session=session,
                     item_type='WWW',
                     item_text=item_text
@@ -206,7 +277,7 @@ class RetroConsumer(WebsocketConsumer):
                 retro_board_item.save()
             elif item_type == 'what_did_not':
                 retro_board_item = RetroBoardItems.objects.create(
-                    owner=self.scope['user'],
+                    owner=owner,
                     session=session,
                     item_type='WDN',
                     item_text=item_text
@@ -214,20 +285,19 @@ class RetroConsumer(WebsocketConsumer):
                 retro_board_item.save()
             else:
                 retro_board_item = RetroBoardItems.objects.create(
-                    owner=self.scope['user'],
+                    owner=owner,
                     session=session,
                     item_type='AI',
                     item_text=item_text
                 )
                 retro_board_item.save()
 
-            # Send message to room group
             async_to_sync(self.channel_layer.group_send)(
                 self.room_group_name,
                 {
                     'type': 'send_out_retro_board_item_to_websocket',
                     'item_id': retro_board_item.id,
-                    'item_owner': self.scope['user'].username,
+                    'item_owner': owner.username,
                     'item_type': retro_board_item.item_type,
                     'item_text': item_text,
                     'session': self.scope['url_route']['kwargs']['session_name']
@@ -410,6 +480,8 @@ class PokerConsumer(WebsocketConsumer):
                     'story': text_data_json['story']
                 }
             )
+        elif 'close_socket' in text_data_json:
+            self.close()
 
     def toggle_next_story(self, event):
         toggle_next_story = event['toggle_next_story']
@@ -520,7 +592,7 @@ class LobbyConsumer(WebsocketConsumer):
                 else:
                     has_joined = 'New player joined the session'
                     new_member = SessionMember.objects.create(
-                        session=session, member=self.scope['user']
+                        session=session, member=user
                     )
                     new_member.save()
 
@@ -560,7 +632,7 @@ class LobbyConsumer(WebsocketConsumer):
                 self.room_group_name,
                 {
                     'type': 'cancel_game',
-                    'display_retro': cancel_game
+                    'cancel_game': cancel_game
                 }
             )
         elif 'exit_game' in text_data_json:
@@ -583,7 +655,7 @@ class LobbyConsumer(WebsocketConsumer):
                 if member is not None:
                     member = SessionMember.objects.get(
                         session=session,
-                        member=self.scope['user']
+                        member=user
                     )
                     member.delete()
                     exit_game = 'User has left the session'
@@ -627,7 +699,6 @@ class LobbyConsumer(WebsocketConsumer):
         self.send(text_data=json.dumps({
             'cancel_game': cancel_game
         }))
-        self.close()
 
     def exit_game(self, event):
         exit_game = event['exit_game']
@@ -636,4 +707,3 @@ class LobbyConsumer(WebsocketConsumer):
             'exit_game': exit_game,
             'player': player
         }))
-        self.close()

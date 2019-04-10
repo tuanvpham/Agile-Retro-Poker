@@ -151,6 +151,11 @@ JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=2),
 }
 
+
+# CORS_ORIGIN_WHITELIST = (
+#     'localhost:3000',
+# )
+
 CORS_ORIGIN_ALLOW_ALL = True
 
 ASGI_APPLICATION = "agilecommandcentral.routing.application"
