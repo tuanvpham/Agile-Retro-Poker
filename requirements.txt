@@ -28,7 +28,7 @@ django-json-response==1.1.5
 django-oauth-toolkit==1.2.0
 django-response-timeout==0.1.0
 django-webpack-loader==0.6.0
-djangorestframework==3.9.0
+djangorestframework==3.11.2
 djangorestframework-jwt==1.11.0
 hiredis==0.3.1
 hyperlink==18.0.0
